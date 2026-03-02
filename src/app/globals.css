@@ -1,26 +1,142 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Parish custom colors */
+  --color-navy: #1A3268;
+  --color-royal: #2968A9;
+  --color-sky: #6DB8E3;
+  --color-light-blue: #C5DFF0;
+  --color-ice: #EAF3FA;
+  --color-gold: #C9A84C;
+  --color-gold-light: #D4BF7A;
+  --color-gold-dark: #A8893D;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+  /* Parish Color Palette — Nossa Senhora Aparecida */
+  --background: #FFFFFF;
+  --foreground: #1A3268;
+  --card: #FFFFFF;
+  --card-foreground: #1A3268;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A3268;
+  --primary: #1A3268;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EAF3FA;
+  --secondary-foreground: #1A3268;
+  --muted: #EAF3FA;
+  --muted-foreground: #4A6FA5;
+  --accent: #C9A84C;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --border: #C5DFF0;
+  --input: #C5DFF0;
+  --ring: #2968A9;
+  --chart-1: #1A3268;
+  --chart-2: #2968A9;
+  --chart-3: #6DB8E3;
+  --chart-4: #C9A84C;
+  --chart-5: #C5DFF0;
+  --sidebar: #F0F6FB;
+  --sidebar-foreground: #1A3268;
+  --sidebar-primary: #1A3268;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EAF3FA;
+  --sidebar-accent-foreground: #1A3268;
+  --sidebar-border: #C5DFF0;
+  --sidebar-ring: #2968A9;
+}
+
+.dark {
+  --background: #0F1A2E;
+  --foreground: #EAF3FA;
+  --card: #162240;
+  --card-foreground: #EAF3FA;
+  --popover: #162240;
+  --popover-foreground: #EAF3FA;
+  --primary: #6DB8E3;
+  --primary-foreground: #0F1A2E;
+  --secondary: #1A3268;
+  --secondary-foreground: #EAF3FA;
+  --muted: #1A3268;
+  --muted-foreground: #8BA7CC;
+  --accent: #D4BF7A;
+  --accent-foreground: #0F1A2E;
+  --destructive: #EF4444;
+  --border: rgba(109, 184, 227, 0.2);
+  --input: rgba(109, 184, 227, 0.25);
+  --ring: #6DB8E3;
+  --chart-1: #6DB8E3;
+  --chart-2: #2968A9;
+  --chart-3: #C9A84C;
+  --chart-4: #C5DFF0;
+  --chart-5: #1A3268;
+  --sidebar: #162240;
+  --sidebar-foreground: #EAF3FA;
+  --sidebar-primary: #6DB8E3;
+  --sidebar-primary-foreground: #0F1A2E;
+  --sidebar-accent: #1A3268;
+  --sidebar-accent-foreground: #EAF3FA;
+  --sidebar-border: rgba(109, 184, 227, 0.2);
+  --sidebar-ring: #6DB8E3;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
