@@ -1,8 +1,6 @@
-"use client";
-
 import { CalendarDays } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useParishStore } from "@/store/useParishStore";
+import { prisma } from "@/lib/prisma";
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr + "T12:00:00");
@@ -13,8 +11,13 @@ function formatDate(dateStr: string) {
   });
 }
 
-export function EventsSection() {
-  const { events } = useParishStore();
+export async function EventsSection() {
+  const today = new Date().toISOString().split("T")[0];
+  const events = await prisma.event.findMany({
+    where: { date: { gte: today } },
+    orderBy: { date: "asc" },
+    take: 3,
+  });
 
   return (
     <section id="eventos" className="bg-ice py-20">
@@ -53,6 +56,11 @@ export function EventsSection() {
               </CardContent>
             </Card>
           ))}
+          {events.length === 0 && (
+            <p className="col-span-3 text-center text-muted-foreground">
+              Nenhum evento próximo no momento.
+            </p>
+          )}
         </div>
       </div>
     </section>
