@@ -13,14 +13,32 @@ export async function POST(request: Request) {
       );
     }
 
-    if (password.length < 6) {
+    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") {
       return NextResponse.json(
-        { error: "A senha deve ter pelo menos 6 caracteres." },
+        { error: "Dados inválidos." },
         { status: 400 }
       );
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const trimmedName = name.trim().slice(0, 200);
+    const trimmedEmail = email.trim().toLowerCase().slice(0, 254);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return NextResponse.json(
+        { error: "Email inválido." },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 6 || password.length > 128) {
+      return NextResponse.json(
+        { error: "A senha deve ter entre 6 e 128 caracteres." },
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
     if (existing) {
       return NextResponse.json(
         { error: "Este email já está cadastrado." },
@@ -32,8 +50,8 @@ export async function POST(request: Request) {
 
     await prisma.user.create({
       data: {
-        name,
-        email,
+        name: trimmedName,
+        email: trimmedEmail,
         passwordHash,
         role: "user",
         isActive: true,
