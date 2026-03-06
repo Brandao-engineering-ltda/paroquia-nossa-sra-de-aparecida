@@ -14,8 +14,8 @@ Parish website for "Paroquia Nossa Senhora Aparecida" (Maringa, PR, Brazil). A f
 | UI Library   | React                               | 19.2.3   |
 | Styling      | Tailwind CSS + shadcn/ui            | 4.x      |
 | Auth         | Auth.js (next-auth v5 beta)         | 5.0.0-b  |
-| Database     | SQLite via Prisma 7                 | 7.4.2    |
-| DB Adapter   | @prisma/adapter-better-sqlite3      | 7.4.2    |
+| Database     | SQLite via Prisma 7 (Turso in prod) | 7.4.2    |
+| DB Adapter   | @prisma/adapter-libsql              | 7.4.2    |
 | State (UI)   | Zustand                             | 5.x      |
 | Testing      | Vitest + React Testing Library      | 4.x      |
 | CI/CD        | GitHub Actions + Vercel             | -        |
@@ -124,7 +124,7 @@ paroquia-nossa-sra-de-aparecida/
 
 ### 3. Data Layer
 
-**Database:** SQLite via Prisma 7 with `@prisma/adapter-better-sqlite3`.
+**Database:** SQLite via Prisma 7 with `@prisma/adapter-libsql`. Uses local SQLite file in development and Turso (hosted libSQL) in production.
 
 **Models:**
 

@@ -63,12 +63,13 @@ No manual deployment steps needed — merging the PR triggers deployment.
 
 In the Vercel dashboard, go to **Settings > Environment Variables** and add:
 
-| Variable       | Staging                            | Production                       |
-|----------------|------------------------------------|----------------------------------|
-| `DATABASE_URL` | Your staging DB connection string  | Your production DB connection string |
-| `AUTH_SECRET`  | Generate with `npx auth secret`    | Generate with `npx auth secret` (different from staging!) |
-| `AUTH_URL`     | `https://your-staging-url.vercel.app` | `https://your-production-url.vercel.app` |
-| `NODE_ENV`     | `production`                       | `production`                     |
+| Variable              | Staging                            | Production                       |
+|-----------------------|------------------------------------|----------------------------------|
+| `DATABASE_URL`        | Turso staging DB URL               | Turso production DB URL          |
+| `DATABASE_AUTH_TOKEN` | Turso staging auth token           | Turso production auth token      |
+| `AUTH_SECRET`         | Generate with `npx auth secret`    | Generate with `npx auth secret` (different from staging!) |
+| `AUTH_URL`            | `https://your-staging-url.vercel.app` | `https://your-production-url.vercel.app` |
+| `NODE_ENV`            | `production`                       | `production`                     |
 
 **Important:**
 - Each environment must have its **own** `AUTH_SECRET` (never share between staging and prod)
@@ -76,30 +77,40 @@ In the Vercel dashboard, go to **Settings > Environment Variables** and add:
   - Staging values → **Preview** environment
   - Production values → **Production** environment
 
-### 3. Database Setup for Production
+### 3. Database Setup (Turso)
 
-SQLite works great for development but has limitations for production on serverless platforms (Vercel). For production, consider:
+The app uses **Turso** (hosted libSQL) for production. Local development uses a local SQLite file (`file:./dev.db`).
 
-**Option A: Keep SQLite (small scale / low traffic)**
-- Use a persistent volume or an SQLite hosting service like Turso
-- Change `DATABASE_URL` to the remote connection string
+#### Create Turso Databases
 
-**Option B: Migrate to PostgreSQL (recommended for scale)**
-1. Update `prisma/schema.prisma`:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-   }
-   ```
-2. Update `prisma.config.ts` with the PostgreSQL connection URL
-3. Replace `@prisma/adapter-better-sqlite3` with `@prisma/adapter-pg` or use Prisma's native driver
-4. Update `src/lib/prisma.ts` accordingly
-5. Run `npx prisma db push` against the new database
+```bash
+# Install Turso CLI
+brew install tursodatabase/tap/turso
 
-Recommended PostgreSQL providers:
-- **Vercel Postgres** (tight Vercel integration)
-- **Neon** (serverless Postgres, generous free tier)
-- **Supabase** (Postgres + extras)
+# Login
+turso auth login
+
+# Create production database
+turso db create paroquia-nsa-prod
+
+# Create staging database
+turso db create paroquia-nsa-staging
+
+# Get connection URLs
+turso db show paroquia-nsa-prod --url
+turso db show paroquia-nsa-staging --url
+
+# Create auth tokens
+turso db tokens create paroquia-nsa-prod
+turso db tokens create paroquia-nsa-staging
+```
+
+#### Push Schema to Turso
+
+```bash
+# Set the Turso URL and token temporarily to push schema
+DATABASE_URL="libsql://your-db.turso.io" DATABASE_AUTH_TOKEN="your-token" npx prisma db push
+```
 
 ### 4. Seed the Admin User
 
@@ -200,12 +211,13 @@ git push origin staging
 
 ## Environment Variables Reference
 
-| Variable       | Required | Description                              |
-|----------------|----------|------------------------------------------|
-| `DATABASE_URL` | Yes      | Database connection string               |
-| `AUTH_SECRET`   | Yes      | Random secret for Auth.js JWT signing    |
-| `AUTH_URL`      | Yes*     | Full URL of the app (Vercel auto-sets)   |
-| `NODE_ENV`      | No       | Set automatically by Vercel              |
+| Variable              | Required | Description                              |
+|-----------------------|----------|------------------------------------------|
+| `DATABASE_URL`        | Yes      | Database connection string (Turso URL or local file) |
+| `DATABASE_AUTH_TOKEN` | Prod     | Turso auth token (not needed for local dev) |
+| `AUTH_SECRET`         | Yes      | Random secret for Auth.js JWT signing    |
+| `AUTH_URL`            | Yes*     | Full URL of the app (Vercel auto-sets)   |
+| `NODE_ENV`            | No       | Set automatically by Vercel              |
 
 *`AUTH_URL` is auto-detected by Vercel in most cases, but set it explicitly if using a custom domain.
 
