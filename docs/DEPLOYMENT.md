@@ -22,7 +22,7 @@ feature/my-feature ──PR──> staging ──PR──> main
 ```
 
 1. **Feature branches** — Create from `staging`, develop locally
-2. **Pull Request to `staging`** — CI runs (lint, test, build, security scan). On merge, Vercel deploys to staging environment
+2. **Pull Request to `staging`** — CI runs (lint, test, build). On merge, Vercel deploys to staging environment
 3. **Pull Request from `staging` to `main`** — After QA on staging, merge triggers production deployment
 
 ---
@@ -38,7 +38,6 @@ Triggers on every push/PR to `main` and `staging`:
 | Lint      | Runs ESLint across the codebase                 |
 | Test      | Runs Vitest with coverage (80% threshold)       |
 | Build     | Runs `prisma generate` + `next build`           |
-| Security  | Runs gitleaks to scan for leaked secrets         |
 
 All jobs must pass before a PR can be merged.
 
@@ -152,7 +151,7 @@ git checkout -b feature/my-feature
 # 2. Develop and commit
 git add src/components/MyFeature.tsx
 git commit -m "feat: add my feature"
-# Pre-commit hooks run: ESLint, Vitest, gitleaks
+# Pre-commit hooks run: ESLint, Vitest
 
 # 3. Push and create PR to staging
 git push -u origin feature/my-feature
@@ -240,7 +239,6 @@ Every commit locally runs these checks via Husky:
 
 1. **lint-staged** — ESLint with `--max-warnings=0` on staged `.ts`/`.tsx` files
 2. **vitest run** — Full test suite (150+ tests, 80% coverage threshold)
-3. **gitleaks protect** — Scans staged files for credentials and secrets
 
 If any check fails, the commit is blocked. Fix the issue and commit again.
 
@@ -263,8 +261,4 @@ npm run test:coverage    # Run tests with coverage report
 npx prisma generate      # Generate Prisma Client
 npx prisma db push       # Push schema to database
 npx prisma studio        # Open Prisma Studio (DB browser)
-
-# Security
-gitleaks detect          # Scan full git history for secrets
-gitleaks protect --staged # Scan staged files only
 ```

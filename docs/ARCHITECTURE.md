@@ -19,7 +19,7 @@ Parish website for "Paroquia Nossa Senhora Aparecida" (Maringa, PR, Brazil). A f
 | State (UI)   | Zustand                             | 5.x      |
 | Testing      | Vitest + React Testing Library      | 4.x      |
 | CI/CD        | GitHub Actions + Vercel             | -        |
-| Security     | gitleaks, Husky pre-commit hooks    | -        |
+| Security     | Husky pre-commit hooks               | -        |
 
 ---
 
@@ -28,7 +28,7 @@ Parish website for "Paroquia Nossa Senhora Aparecida" (Maringa, PR, Brazil). A f
 ```
 paroquia-nossa-sra-de-aparecida/
 ├── .github/workflows/         # CI pipeline (lint, test, build, security)
-├── .husky/                    # Git hooks (pre-commit: lint + test + gitleaks)
+├── .husky/                    # Git hooks (pre-commit: lint + test)
 ├── prisma/
 │   └── schema.prisma          # Database schema (User, Event models)
 ├── prisma.config.ts           # Prisma v7 datasource config
@@ -65,7 +65,6 @@ paroquia-nossa-sra-de-aparecida/
 │   ├── middleware.ts           # Route protection (admin, calendario)
 │   └── __tests__/             # Unit tests mirroring source structure
 ├── .env.example               # Environment variable template
-├── .gitleaks.toml             # Secret scanning config
 ├── vercel.json                # Vercel deployment config
 ├── vitest.config.ts           # Test configuration
 ├── next.config.ts             # Next.js config (security headers)
@@ -197,8 +196,8 @@ Event
 - **Authorization checks** on every mutating API endpoint
 
 ### Development Security
-- **Pre-commit hooks (Husky):** ESLint (0 warnings), Vitest (all tests pass), gitleaks (secret scan)
-- **CI pipeline:** Same checks + build verification + gitleaks-action on PRs
+- **Pre-commit hooks (Husky):** ESLint (0 warnings), Vitest (all tests pass)
+- **CI pipeline:** Same checks + build verification on PRs
 - **.gitignore:** Covers .env*, *.db, *.pem, *.key, *.p12, *.pfx, *.crt
 
 ---

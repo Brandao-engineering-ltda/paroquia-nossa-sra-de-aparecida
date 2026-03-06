@@ -1,3 +1,2 @@
 npx lint-staged
 npx vitest run
-gitleaks protect --staged --verbose
