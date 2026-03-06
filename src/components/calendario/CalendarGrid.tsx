@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,23 +42,29 @@ export function CalendarGrid() {
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventData | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const fetchEvents = useCallback(async () => {
-    const res = await fetch(
-      `/api/eventos?month=${month + 1}&year=${year}`
-    );
-    if (res.ok) {
-      const data = await res.json();
-      setEvents(data);
-    }
-  }, [month, year]);
-
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+    let cancelled = false;
+    async function loadEvents() {
+      const res = await fetch(
+        `/api/eventos?month=${month + 1}&year=${year}`
+      );
+      if (res.ok && !cancelled) {
+        const data = await res.json();
+        setEvents(data);
+      }
+    }
+    loadEvents();
+    return () => { cancelled = true; };
+  }, [month, year, refreshKey]);
+
+  function refreshEvents() {
+    setRefreshKey((k) => k + 1);
+  }
 
   function prevMonth() {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -91,7 +97,7 @@ export function CalendarGrid() {
     const res = await fetch(`/api/eventos/${eventId}`, { method: "DELETE" });
     if (res.ok) {
       setSelectedEvent(null);
-      fetchEvents();
+      refreshEvents();
     }
   }
 
@@ -103,7 +109,7 @@ export function CalendarGrid() {
 
   function handleFormSuccess() {
     handleFormClose();
-    fetchEvents();
+    refreshEvents();
   }
 
   const daysInMonth = getDaysInMonth(year, month);
