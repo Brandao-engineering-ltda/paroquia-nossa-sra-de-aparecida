@@ -6,6 +6,8 @@ import { EventsSection } from "@/components/EventsSection";
 import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
