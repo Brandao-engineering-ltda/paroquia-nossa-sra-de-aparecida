@@ -34,8 +34,35 @@ export async function GET() {
     diagnostics.error_name = error instanceof Error ? error.name : "Unknown";
     diagnostics.error_message = error instanceof Error ? error.message : String(error);
     if (error && typeof error === "object" && "cause" in error) {
-      diagnostics.error_cause = String((error as { cause: unknown }).cause);
+      try {
+        diagnostics.error_cause = JSON.parse(JSON.stringify((error as { cause: unknown }).cause));
+      } catch {
+        diagnostics.error_cause = String((error as { cause: unknown }).cause);
+      }
     }
+    diagnostics.error_full = JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+  }
+
+  // Also try raw fetch to Turso to isolate the issue
+  try {
+    const res = await fetch(process.env.DATABASE_URL!.replace("libsql://", "https://") + "/v2/pipeline", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.DATABASE_AUTH_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requests: [
+          { type: "execute", stmt: { sql: "SELECT name FROM sqlite_master WHERE type='table'" } },
+          { type: "close" },
+        ],
+      }),
+    });
+    const data = await res.json();
+    diagnostics.raw_turso_status = res.status;
+    diagnostics.raw_turso_tables = data;
+  } catch (e: unknown) {
+    diagnostics.raw_turso_error = e instanceof Error ? e.message : String(e);
   }
 
   return NextResponse.json(diagnostics, { status: diagnostics.db_connected ? 200 : 500 });
