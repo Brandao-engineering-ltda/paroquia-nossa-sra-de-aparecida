@@ -32,7 +32,7 @@ describe("PUT /api/eventos/[id]", () => {
   });
 
   it("returns 401 when not authenticated", async () => {
-    mockAuth.mockResolvedValue(null as Awaited<ReturnType<typeof auth>>);
+    mockAuth.mockResolvedValue(null as unknown as Awaited<ReturnType<typeof auth>>);
     const req = new Request("http://localhost/api/eventos/e1", {
       method: "PUT",
       body: JSON.stringify({}),
@@ -45,7 +45,7 @@ describe("PUT /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue(null);
 
     const req = new Request("http://localhost/api/eventos/e1", {
@@ -60,7 +60,7 @@ describe("PUT /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u2", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue({
       id: "e1",
       createdById: "u1",
@@ -78,7 +78,7 @@ describe("PUT /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue({
       id: "e1",
       createdById: "u1",
@@ -101,7 +101,7 @@ describe("PUT /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u-admin", role: "admin" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue({
       id: "e1",
       createdById: "u1",
@@ -128,7 +128,7 @@ describe("DELETE /api/eventos/[id]", () => {
   });
 
   it("returns 401 when not authenticated", async () => {
-    mockAuth.mockResolvedValue(null as Awaited<ReturnType<typeof auth>>);
+    mockAuth.mockResolvedValue(null as unknown as Awaited<ReturnType<typeof auth>>);
     const req = new Request("http://localhost/api/eventos/e1", { method: "DELETE" });
     const res = await DELETE(req, makeParams("e1"));
     expect(res.status).toBe(401);
@@ -138,7 +138,7 @@ describe("DELETE /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue(null);
 
     const req = new Request("http://localhost/api/eventos/e1", { method: "DELETE" });
@@ -150,7 +150,7 @@ describe("DELETE /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u2", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue({
       id: "e1",
       createdById: "u1",
@@ -165,7 +165,7 @@ describe("DELETE /api/eventos/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockEventFindUnique.mockResolvedValue({
       id: "e1",
       createdById: "u1",

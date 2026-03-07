@@ -36,7 +36,7 @@ export async function EventsSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {events.map((event) => (
+          {events.map((event: { id: string; date: string; title: string; description: string }) => (
             <Card
               key={event.id}
               className="group overflow-hidden border-border/50 transition-all duration-300 hover:-translate-y-1 hover:border-gold/30 hover:shadow-lg"

@@ -25,7 +25,7 @@ describe("PATCH /api/admin/users/[id]", () => {
   });
 
   it("returns 403 when not authenticated", async () => {
-    mockAuth.mockResolvedValue(null as Awaited<ReturnType<typeof auth>>);
+    mockAuth.mockResolvedValue(null as unknown as Awaited<ReturnType<typeof auth>>);
     const req = new Request("http://localhost/api/admin/users/u1", {
       method: "PATCH",
       body: JSON.stringify({ role: "admin" }),
@@ -38,7 +38,7 @@ describe("PATCH /api/admin/users/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     const req = new Request("http://localhost/api/admin/users/u2", {
       method: "PATCH",
       body: JSON.stringify({ role: "admin" }),
@@ -51,7 +51,7 @@ describe("PATCH /api/admin/users/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u-admin", role: "admin" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockUserUpdate.mockResolvedValue({
       id: "u2",
       name: "User",
@@ -78,7 +78,7 @@ describe("PATCH /api/admin/users/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u-admin", role: "admin" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockUserUpdate.mockResolvedValue({
       id: "u2",
       name: "User",
@@ -105,7 +105,7 @@ describe("PATCH /api/admin/users/[id]", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u-admin", role: "admin" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockUserUpdate.mockResolvedValue({
       id: "u2",
       name: "User",

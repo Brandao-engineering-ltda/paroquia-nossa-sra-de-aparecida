@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { Header } from "@/components/Header";
 
 // Mock next-auth/react
-const mockSession = { data: null, status: "unauthenticated" as const };
+const mockSession: { data: unknown; status: string } = { data: null, status: "unauthenticated" };
 vi.mock("next-auth/react", () => ({
   useSession: () => mockSession,
   signOut: vi.fn(),
