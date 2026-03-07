@@ -72,7 +72,7 @@ describe("POST /api/eventos", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", name: "Test", email: "t@t.com", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockUserFindUnique.mockResolvedValue({
       id: "u1",
       name: "Test",
@@ -98,7 +98,7 @@ describe("POST /api/eventos", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", name: "Test", email: "t@t.com", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockUserFindUnique.mockResolvedValue({
       id: "u1",
       name: "Test",
@@ -124,7 +124,7 @@ describe("POST /api/eventos", () => {
     mockAuth.mockResolvedValue({
       user: { id: "u1", name: "Test", email: "t@t.com", role: "user" },
       expires: "",
-    } as Awaited<ReturnType<typeof auth>>);
+    } as unknown as Awaited<ReturnType<typeof auth>>);
     mockUserFindUnique.mockResolvedValue({
       id: "u1",
       name: "Test",

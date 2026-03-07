@@ -47,9 +47,9 @@ describe("authConfig", () => {
       const result = authConfig.callbacks!.session!({
         session,
         token,
-      } as Parameters<NonNullable<typeof authConfig.callbacks>["session"]>[0]);
-      expect((result as typeof session).user.role).toBe("admin");
-      expect((result as typeof session).user.id).toBe("u1");
+      } as unknown as Parameters<NonNullable<typeof authConfig.callbacks>["session"]>[0]);
+      expect((result as unknown as typeof session).user.role).toBe("admin");
+      expect((result as unknown as typeof session).user.id).toBe("u1");
     });
   });
 });
