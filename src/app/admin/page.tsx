@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, CalendarDays, UserCheck } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const [totalUsers, activeUsers, totalEvents] = await Promise.all([
     prisma.user.count(),
