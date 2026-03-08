@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 interface NavItem {
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   label: string;
 }
 
