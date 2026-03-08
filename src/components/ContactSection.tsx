@@ -7,22 +7,29 @@ const contactInfo = [
   {
     icon: MapPin,
     title: "Endereço",
-    lines: ["Rua Exemplo, 123", "Jd. Alvorada — Maringá, PR", "CEP: 87000-000"],
+    lines: [
+      "Praça Nossa Senhora Aparecida, s/n",
+      "Vila Esperança — Maringá, PR",
+      "CEP: 87020-790",
+    ],
   },
   {
     icon: Phone,
     title: "Telefone",
-    lines: ["(44) 3000-0000", "(44) 99999-0000"],
+    lines: ["(44) 3267-0484", "(44) 98423-0760 (WhatsApp)"],
   },
   {
     icon: Mail,
     title: "E-mail",
-    lines: ["contato@nsaparecida.org.br"],
+    lines: ["secretaria@paroquiaaparecidamga.com.br"],
   },
   {
     icon: Clock,
     title: "Secretaria",
-    lines: ["Seg a Sex: 08:00 — 17:00", "Sábado: 08:00 — 12:00"],
+    lines: [
+      "Seg a Sex: 08:00 — 12:00 / 13:00 — 17:00",
+      "Sábado: 08:00 — 12:00",
+    ],
   },
 ];
 
@@ -65,6 +72,20 @@ export function ContactSection() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Map */}
+        <div className="mt-12 overflow-hidden rounded-2xl border border-border/50 shadow-lg">
+          <iframe
+            title="Localização da Paróquia Nossa Senhora Aparecida"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3661.5!2d-51.9386!3d-23.4206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ecd70e49c1c1c1%3A0x2e0e0e0e0e0e0e0e!2sPar%C3%B3quia%20Nossa%20Senhora%20Aparecida%20-%20Vila%20Esperan%C3%A7a%2C%20Maring%C3%A1%20-%20PR!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr"
+            width="100%"
+            height="400"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </div>
     </section>

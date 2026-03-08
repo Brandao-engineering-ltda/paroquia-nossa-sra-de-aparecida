@@ -18,20 +18,24 @@ describe("ContactSection", () => {
 
   it("renders address details", () => {
     render(<ContactSection />);
-    expect(screen.getByText("Rua Exemplo, 123")).toBeInTheDocument();
-    expect(screen.getByText("CEP: 87000-000")).toBeInTheDocument();
+    expect(
+      screen.getByText("Praça Nossa Senhora Aparecida, s/n")
+    ).toBeInTheDocument();
+    expect(screen.getByText("CEP: 87020-790")).toBeInTheDocument();
   });
 
   it("renders contact details", () => {
     render(<ContactSection />);
-    expect(screen.getByText("(44) 3000-0000")).toBeInTheDocument();
-    expect(screen.getByText("contato@nsaparecida.org.br")).toBeInTheDocument();
+    expect(screen.getByText("(44) 3267-0484")).toBeInTheDocument();
+    expect(
+      screen.getByText("secretaria@paroquiaaparecidamga.com.br")
+    ).toBeInTheDocument();
   });
 
   it("renders office hours", () => {
     render(<ContactSection />);
     expect(
-      screen.getByText("Seg a Sex: 08:00 — 17:00")
+      screen.getByText("Seg a Sex: 08:00 — 12:00 / 13:00 — 17:00")
     ).toBeInTheDocument();
     expect(
       screen.getByText("Sábado: 08:00 — 12:00")
@@ -41,5 +45,12 @@ describe("ContactSection", () => {
   it("has correct section id", () => {
     const { container } = render(<ContactSection />);
     expect(container.querySelector("#contato")).toBeInTheDocument();
+  });
+
+  it("renders the embedded map", () => {
+    render(<ContactSection />);
+    expect(
+      screen.getByTitle("Localização da Paróquia Nossa Senhora Aparecida")
+    ).toBeInTheDocument();
   });
 });
