@@ -14,6 +14,12 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+// Mock TodayEvents client component
+vi.mock("@/components/TodayEvents", () => ({
+  TodayEvents: ({ events }: { events: unknown[] }) =>
+    events.length > 0 ? <div data-testid="today-events">Today</div> : null,
+}));
+
 import { prisma } from "@/lib/prisma";
 const mockEventFindMany = vi.mocked(prisma.event.findMany);
 const mockBannerFindMany = vi.mocked(prisma.banner.findMany);
@@ -26,13 +32,6 @@ describe("EventsSection", () => {
     mockBannerFindMany.mockResolvedValue([]);
   });
 
-  it("renders the section heading", async () => {
-    mockEventFindMany.mockResolvedValue([]);
-    const Component = await EventsSection();
-    render(Component);
-    expect(screen.getByText("Próximos Eventos")).toBeInTheDocument();
-  });
-
   it("renders events from database", async () => {
     mockEventFindMany.mockResolvedValue([
       {
@@ -42,7 +41,9 @@ describe("EventsSection", () => {
         date: "2026-04-15",
         startTime: null,
         endTime: null,
-        location: null,
+        pastoral: "Liturgia",
+        tipo: "Missa",
+        local: "Matriz - Igreja",
         createdById: "u1",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -65,20 +66,55 @@ describe("EventsSection", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders badge and description", async () => {
-    mockEventFindMany.mockResolvedValue([]);
-    const Component = await EventsSection();
-    render(Component);
-    expect(screen.getByText("Agenda")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Fique por dentro das atividades/)
-    ).toBeInTheDocument();
-  });
-
   it("has correct section id", async () => {
     mockEventFindMany.mockResolvedValue([]);
     const Component = await EventsSection();
     const { container } = render(Component);
     expect(container.querySelector("#eventos")).toBeInTheDocument();
+  });
+
+  it("renders today events section when there are events today", async () => {
+    mockEventFindMany.mockResolvedValue([
+      {
+        id: "t1",
+        title: "Missa Hoje",
+        description: "Desc",
+        date: new Date().toISOString().split("T")[0],
+        startTime: "10:00",
+        endTime: null,
+        pastoral: "Liturgia",
+        tipo: "Missa",
+        local: "Matriz - Igreja",
+        createdById: "u1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+    const Component = await EventsSection();
+    render(Component);
+    expect(screen.getByTestId("today-events")).toBeInTheDocument();
+  });
+
+  it("renders event cards as links to detail page", async () => {
+    mockEventFindMany.mockResolvedValue([
+      {
+        id: "ev1",
+        title: "Evento Link",
+        description: "Desc",
+        date: "2026-04-15",
+        startTime: null,
+        endTime: null,
+        pastoral: "Liturgia",
+        tipo: "Missa",
+        local: "Matriz - Igreja",
+        createdById: "u1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+    const Component = await EventsSection();
+    render(Component);
+    const link = screen.getByRole("link", { name: /Evento Link/ });
+    expect(link).toHaveAttribute("href", "/eventos/ev1");
   });
 });

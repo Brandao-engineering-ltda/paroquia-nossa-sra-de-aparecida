@@ -14,15 +14,21 @@ const mockEvents = [
     date: "2026-04-15",
     startTime: "10:00",
     endTime: "11:00",
+    pastoral: "Liturgia",
+    tipo: "Missa",
+    local: "Matriz - Igreja",
     createdBy: { name: "Admin" },
   },
   {
     id: "e2",
-    title: "Catequese",
+    title: "Encontro de Catequese",
     description: "Desc",
     date: "2026-04-20",
     startTime: null,
     endTime: null,
+    pastoral: "Catequese",
+    tipo: "Catequese",
+    local: "Capela - Salão",
     createdBy: { name: "User" },
   },
 ];
@@ -35,6 +41,9 @@ describe("AdminEventList", () => {
   it("renders table headers", () => {
     render(<AdminEventList initialEvents={mockEvents} />);
     expect(screen.getByText("Título")).toBeInTheDocument();
+    expect(screen.getByText("Tipo")).toBeInTheDocument();
+    expect(screen.getByText("Pastoral")).toBeInTheDocument();
+    expect(screen.getByText("Local")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
     expect(screen.getByText("Horário")).toBeInTheDocument();
     expect(screen.getByText("Criado por")).toBeInTheDocument();
@@ -44,7 +53,7 @@ describe("AdminEventList", () => {
   it("renders event rows", () => {
     render(<AdminEventList initialEvents={mockEvents} />);
     expect(screen.getByText("Missa Especial")).toBeInTheDocument();
-    expect(screen.getByText("Catequese")).toBeInTheDocument();
+    expect(screen.getByText("Encontro de Catequese")).toBeInTheDocument();
   });
 
   it("renders event dates formatted", () => {
