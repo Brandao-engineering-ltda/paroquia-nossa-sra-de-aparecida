@@ -4,13 +4,17 @@ import userEvent from "@testing-library/user-event";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 const mockSignIn = vi.fn();
+const mockGetSession = vi.fn();
 vi.mock("next-auth/react", () => ({
   signIn: (...args: unknown[]) => mockSignIn(...args),
+  getSession: () => mockGetSession(),
 }));
 
 describe("LoginForm", () => {
   beforeEach(() => {
     mockSignIn.mockReset();
+    mockGetSession.mockReset();
+    mockGetSession.mockResolvedValue({ user: { role: "user" } });
   });
 
   it("renders the form with email and password fields", () => {

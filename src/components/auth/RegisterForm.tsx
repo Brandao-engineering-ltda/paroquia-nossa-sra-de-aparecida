@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UserPlus } from "lucide-react";
+import { UserPlus, ArrowLeft } from "lucide-react";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -59,7 +59,7 @@ export function RegisterForm() {
             <UserPlus className="h-4 w-4" />
             Cadastro
           </div>
-          <h1 className="text-2xl font-bold text-navy">Criar Conta</h1>
+          <h1 className="text-2xl font-bold text-foreground">Criar Conta</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Crie sua conta para acessar o calendário da paróquia
           </p>
@@ -136,6 +136,14 @@ export function RegisterForm() {
             Entrar
           </Link>
         </p>
+
+        <Link
+          href="/"
+          className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar ao início
+        </Link>
       </CardContent>
     </Card>
   );
