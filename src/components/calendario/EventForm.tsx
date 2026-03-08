@@ -74,7 +74,7 @@ export function EventForm({
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-navy">
+          <DialogTitle className="text-foreground">
             {isEditing ? "Editar Evento" : "Novo Evento"}
           </DialogTitle>
         </DialogHeader>

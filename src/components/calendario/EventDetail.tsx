@@ -54,7 +54,7 @@ export function EventDetail({
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-navy">{event.title}</DialogTitle>
+          <DialogTitle className="text-foreground">{event.title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -63,13 +63,13 @@ export function EventDetail({
           </p>
 
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-navy">
+            <div className="flex items-center gap-2 text-sm text-foreground">
               <CalendarDays className="h-4 w-4 text-royal" />
               {formatDate(event.date)}
             </div>
 
             {(event.startTime || event.endTime) && (
-              <div className="flex items-center gap-2 text-sm text-navy">
+              <div className="flex items-center gap-2 text-sm text-foreground">
                 <Clock className="h-4 w-4 text-royal" />
                 {event.startTime}
                 {event.endTime && ` — ${event.endTime}`}
@@ -77,7 +77,7 @@ export function EventDetail({
             )}
 
             {event.location && (
-              <div className="flex items-center gap-2 text-sm text-navy">
+              <div className="flex items-center gap-2 text-sm text-foreground">
                 <MapPin className="h-4 w-4 text-royal" />
                 {event.location}
               </div>

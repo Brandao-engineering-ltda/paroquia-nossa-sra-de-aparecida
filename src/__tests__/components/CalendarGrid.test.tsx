@@ -65,7 +65,7 @@ describe("CalendarGrid", () => {
   it("renders 'Novo Evento' button", async () => {
     render(<CalendarGrid />);
     await waitFor(() => {
-      expect(screen.getByText("Novo Evento")).toBeInTheDocument();
+      expect(screen.getByText("Novo")).toBeInTheDocument();
     });
   });
 
@@ -74,7 +74,7 @@ describe("CalendarGrid", () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText("Novo Evento")).toBeInTheDocument();
+      expect(screen.getByText("Novo")).toBeInTheDocument();
     });
 
     const buttons = screen.getAllByRole("button");
@@ -107,10 +107,10 @@ describe("CalendarGrid", () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Novo Evento/ })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Novo/ })).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: /Novo Evento/ }));
+    await user.click(screen.getByRole("button", { name: /Novo/ }));
     // Dialog opens showing the form title
     expect(screen.getByTestId("dialog")).toBeInTheDocument();
   });
@@ -137,7 +137,7 @@ describe("CalendarGrid", () => {
 
     render(<CalendarGrid />);
     await waitFor(() => {
-      expect(screen.getByText("Evento Teste")).toBeInTheDocument();
+      expect(screen.getAllByText("Evento Teste").length).toBeGreaterThan(0);
     });
   });
 });

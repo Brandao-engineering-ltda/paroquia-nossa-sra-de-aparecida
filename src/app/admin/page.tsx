@@ -1,14 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, CalendarDays, UserCheck } from "lucide-react";
+import { Users, CalendarDays, UserCheck, Megaphone } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const [totalUsers, activeUsers, totalEvents] = await Promise.all([
+  const [totalUsers, activeUsers, totalEvents, activeBanners] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
     prisma.event.count(),
+    prisma.banner.count({ where: { isActive: true } }),
   ]);
 
   const stats = [
@@ -33,13 +34,20 @@ export default async function AdminDashboard() {
       color: "text-gold-dark",
       bg: "bg-gold/10",
     },
+    {
+      label: "Destaques Ativos",
+      value: activeBanners,
+      icon: Megaphone,
+      color: "text-royal",
+      bg: "bg-sky/10",
+    },
   ];
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-navy">Painel de Controle</h1>
+      <h1 className="mb-6 text-2xl font-bold text-foreground">Painel de Controle</h1>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="border-border/50">
             <CardContent className="flex items-center gap-4 p-6">
@@ -48,7 +56,7 @@ export default async function AdminDashboard() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-2xl font-bold text-navy">{stat.value}</p>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
               </div>
             </CardContent>
           </Card>

@@ -15,7 +15,7 @@ export default async function AdminEventsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-navy">
+      <h1 className="mb-6 text-2xl font-bold text-foreground">
         Gerenciar Eventos
       </h1>
       <AdminEventList initialEvents={events} />

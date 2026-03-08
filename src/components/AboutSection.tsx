@@ -31,14 +31,14 @@ const features = [
 
 export function AboutSection() {
   return (
-    <section id="sobre" className="bg-white py-20">
+    <section id="sobre" className="bg-background py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gold/10 px-4 py-1.5 text-sm font-medium text-gold-dark">
             <Heart className="h-4 w-4" />
             Nossa História
           </div>
-          <h2 className="text-3xl font-bold text-navy sm:text-4xl">
+          <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
             Sobre a Paróquia
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
@@ -52,12 +52,12 @@ export function AboutSection() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group flex flex-col items-center rounded-2xl border border-border/50 bg-white p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-royal/30 hover:shadow-lg"
+              className="group flex flex-col items-center rounded-2xl border border-border/50 bg-card p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-royal/30 hover:shadow-lg"
             >
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-royal to-navy text-white transition-transform duration-300 group-hover:scale-110">
                 <feature.icon className="h-7 w-7" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-navy">
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
                 {feature.title}
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">

@@ -9,6 +9,11 @@ vi.mock("next-auth/react", () => ({
   signOut: vi.fn(),
 }));
 
+// Mock next-themes
+vi.mock("next-themes", () => ({
+  useTheme: () => ({ theme: "light", setTheme: vi.fn() }),
+}));
+
 // Mock Sheet component (Radix portal issues in jsdom)
 vi.mock("@/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -46,6 +51,12 @@ describe("Header", () => {
   it("shows login button when not authenticated", () => {
     render(<Header />);
     expect(screen.getAllByText("Entrar").length).toBeGreaterThan(0);
+  });
+
+  it("shows theme toggle", () => {
+    render(<Header />);
+    const toggles = screen.getAllByRole("button", { name: "Alternar tema" });
+    expect(toggles.length).toBeGreaterThan(0);
   });
 
   it("shows logout and calendar when authenticated", () => {

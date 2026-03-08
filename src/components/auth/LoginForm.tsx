@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { LogIn } from "lucide-react";
+import { LogIn, ArrowLeft } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -33,7 +33,9 @@ export function LoginForm() {
     if (result?.error) {
       setError("Email ou senha inválidos.");
     } else {
-      router.push("/calendario");
+      const session = await getSession();
+      const isAdmin = session?.user?.role === "admin";
+      router.push(isAdmin ? "/admin" : "/calendario");
       router.refresh();
     }
   }
@@ -47,7 +49,7 @@ export function LoginForm() {
             <LogIn className="h-4 w-4" />
             Acesso
           </div>
-          <h1 className="text-2xl font-bold text-navy">Entrar</h1>
+          <h1 className="text-2xl font-bold text-foreground">Entrar</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Acesse sua conta para gerenciar o calendário
           </p>
@@ -100,6 +102,14 @@ export function LoginForm() {
             Criar conta
           </Link>
         </p>
+
+        <Link
+          href="/"
+          className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar ao início
+        </Link>
       </CardContent>
     </Card>
   );

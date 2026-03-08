@@ -8,7 +8,7 @@ export function HeroSection() {
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-gradient-to-br from-navy via-royal to-navy"
+      className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-gradient-to-br from-navy via-royal to-navy pt-24 sm:pt-28"
     >
       {/* Decorative circles */}
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-sky/10 blur-3xl" />
@@ -53,7 +53,7 @@ export function HeroSection() {
             asChild
             variant="outline"
             size="lg"
-            className="border-white/30 text-white hover:bg-white/10"
+            className="border-white/30 bg-transparent text-white hover:bg-white/10"
           >
             <a href="#sobre">Conheça a Paróquia</a>
           </Button>

@@ -140,3 +140,76 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Hide scrollbar for carousel */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Floating toolbar — spinning gold ring */
+@keyframes spin-gold {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Floating toolbar — theme toggle bounce */
+@keyframes theme-bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* Calendar — staggered cell entrance */
+@keyframes cal-cell-in {
+  from { opacity: 0; transform: scale(0.92) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Calendar — today pulse ring */
+@keyframes cal-today-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(41, 104, 169, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(41, 104, 169, 0); }
+}
+
+/* Calendar — view slide-fade transition */
+@keyframes cal-view-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Calendar — event chip shimmer */
+@keyframes cal-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Calendar — search bar slide-down */
+@keyframes cal-search-in {
+  from { opacity: 0; transform: translateY(-8px); height: 0; }
+  to { opacity: 1; transform: translateY(0); height: auto; }
+}
+
+.cal-cell-animate {
+  animation: cal-cell-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cal-view-animate {
+  animation: cal-view-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cal-search-animate {
+  animation: cal-search-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cal-today-ring {
+  animation: cal-today-pulse 2.5s ease-in-out infinite;
+}
+
+.cal-event-chip:hover {
+  background-size: 200% 100%;
+  animation: cal-shimmer 1.5s linear infinite;
+}

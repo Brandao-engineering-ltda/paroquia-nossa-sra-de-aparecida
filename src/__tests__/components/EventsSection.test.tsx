@@ -8,26 +8,33 @@ vi.mock("@/lib/prisma", () => ({
     event: {
       findMany: vi.fn(),
     },
+    banner: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
 import { prisma } from "@/lib/prisma";
-const mockFindMany = vi.mocked(prisma.event.findMany);
+const mockEventFindMany = vi.mocked(prisma.event.findMany);
+const mockBannerFindMany = vi.mocked(prisma.banner.findMany);
 
 describe("EventsSection", () => {
   beforeEach(() => {
-    mockFindMany.mockReset();
+    mockEventFindMany.mockReset();
+    mockBannerFindMany.mockReset();
+    // Default: no banners so fallback event cards are shown
+    mockBannerFindMany.mockResolvedValue([]);
   });
 
   it("renders the section heading", async () => {
-    mockFindMany.mockResolvedValue([]);
+    mockEventFindMany.mockResolvedValue([]);
     const Component = await EventsSection();
     render(Component);
     expect(screen.getByText("Próximos Eventos")).toBeInTheDocument();
   });
 
   it("renders events from database", async () => {
-    mockFindMany.mockResolvedValue([
+    mockEventFindMany.mockResolvedValue([
       {
         id: "1",
         title: "Missa Especial",
@@ -50,7 +57,7 @@ describe("EventsSection", () => {
   });
 
   it("shows empty message when no events", async () => {
-    mockFindMany.mockResolvedValue([]);
+    mockEventFindMany.mockResolvedValue([]);
     const Component = await EventsSection();
     render(Component);
     expect(
@@ -59,7 +66,7 @@ describe("EventsSection", () => {
   });
 
   it("renders badge and description", async () => {
-    mockFindMany.mockResolvedValue([]);
+    mockEventFindMany.mockResolvedValue([]);
     const Component = await EventsSection();
     render(Component);
     expect(screen.getByText("Agenda")).toBeInTheDocument();
@@ -69,7 +76,7 @@ describe("EventsSection", () => {
   });
 
   it("has correct section id", async () => {
-    mockFindMany.mockResolvedValue([]);
+    mockEventFindMany.mockResolvedValue([]);
     const Component = await EventsSection();
     const { container } = render(Component);
     expect(container.querySelector("#eventos")).toBeInTheDocument();
