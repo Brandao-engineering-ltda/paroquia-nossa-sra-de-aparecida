@@ -37,7 +37,9 @@ export async function PUT(
       date: body.date,
       startTime: body.startTime || null,
       endTime: body.endTime || null,
-      location: body.location || null,
+      pastoral: body.pastoral,
+      tipo: body.tipo,
+      local: body.local,
     },
     include: {
       createdBy: {

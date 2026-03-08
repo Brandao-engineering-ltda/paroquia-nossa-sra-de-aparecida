@@ -198,21 +198,22 @@ export function BannerForm({ banner, onClose, onSuccess }: BannerFormProps) {
           <div className="space-y-2">
             <Label>Imagem (opcional)</Label>
             {imageUrl ? (
-              <div className="flex items-center gap-3 rounded-lg border border-border/50 p-3">
+              <div className="flex items-center gap-3 overflow-hidden rounded-lg border border-border/50 p-3">
                 <Image
                   src={imageUrl}
                   alt="Preview"
                   width={96}
                   height={64}
-                  className="h-16 w-24 rounded object-cover"
+                  className="h-16 w-24 shrink-0 rounded object-cover"
                 />
                 <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
-                  {imageUrl}
+                  {imageUrl.split("/").pop()}
                 </span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
+                  className="shrink-0"
                   onClick={() => {
                     setImageUrl("");
                     if (fileInputRef.current) fileInputRef.current.value = "";

@@ -48,7 +48,14 @@ export async function POST(request: Request) {
     select: { isActive: true },
   });
 
-  if (!user?.isActive) {
+  if (!user) {
+    return NextResponse.json(
+      { error: "Usuário não encontrado. Faça login novamente." },
+      { status: 401 }
+    );
+  }
+
+  if (!user.isActive) {
     return NextResponse.json(
       { error: "Sua conta está desativada. Contate o administrador." },
       { status: 403 }
@@ -56,11 +63,11 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, description, date, startTime, endTime, location } = body;
+  const { title, description, date, startTime, endTime, pastoral, tipo, local } = body;
 
-  if (!title || !date || !description) {
+  if (!title || !date || !description || !pastoral || !tipo || !local) {
     return NextResponse.json(
-      { error: "Título, data e descrição são obrigatórios." },
+      { error: "Título, data, descrição, pastoral, tipo e local são obrigatórios." },
       { status: 400 }
     );
   }
@@ -72,7 +79,9 @@ export async function POST(request: Request) {
       date,
       startTime: startTime || null,
       endTime: endTime || null,
-      location: location || null,
+      pastoral,
+      tipo,
+      local,
       createdById: session.user.id,
     },
     include: {

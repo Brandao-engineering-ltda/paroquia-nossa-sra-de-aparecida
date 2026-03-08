@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { EventForm } from "./EventForm";
 import { EventDetail } from "./EventDetail";
 import { cn } from "@/lib/utils";
+import { getTipoColor } from "@/lib/constants";
 
 interface EventData {
   id: string;
@@ -16,7 +17,9 @@ interface EventData {
   date: string;
   startTime: string | null;
   endTime: string | null;
-  location: string | null;
+  pastoral: string;
+  tipo: string;
+  local: string;
   createdBy: { id: string; name: string };
 }
 
@@ -83,7 +86,9 @@ function matchesSearch(event: EventData, query: string) {
   return (
     event.title.toLowerCase().includes(q) ||
     event.description.toLowerCase().includes(q) ||
-    (event.location?.toLowerCase().includes(q) ?? false)
+    event.pastoral.toLowerCase().includes(q) ||
+    event.tipo.toLowerCase().includes(q) ||
+    event.local.toLowerCase().includes(q)
   );
 }
 
@@ -426,23 +431,27 @@ export function CalendarGrid() {
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gold-dark/70">
             Resultados
           </p>
-          {searchResults.map((event) => (
-            <button
-              key={event.id}
-              onClick={() => setSelectedEvent(event)}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all hover:bg-gold/15 hover:shadow-sm"
-            >
-              <span className="shrink-0 rounded-md bg-gold/20 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-gold-dark">
-                {event.date.split("-").reverse().join("/")}
-              </span>
-              <span className="min-w-0 flex-1 truncate font-medium text-foreground">
-                <HighlightText text={event.title} query={searchQuery} />
-              </span>
-              {event.startTime && (
-                <span className="shrink-0 text-xs text-muted-foreground">{event.startTime}</span>
-              )}
-            </button>
-          ))}
+          {searchResults.map((event) => {
+            const color = getTipoColor(event.tipo);
+            return (
+              <button
+                key={event.id}
+                onClick={() => setSelectedEvent(event)}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all hover:bg-gold/15 hover:shadow-sm"
+              >
+                <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", color.dot)} />
+                <span className="shrink-0 rounded-md bg-gold/20 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-gold-dark">
+                  {event.date.split("-").reverse().join("/")}
+                </span>
+                <span className="min-w-0 flex-1 truncate font-medium text-foreground">
+                  <HighlightText text={event.title} query={searchQuery} />
+                </span>
+                {event.startTime && (
+                  <span className="shrink-0 text-xs text-muted-foreground">{event.startTime}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -612,33 +621,37 @@ function MonthView({
 
                 {/* Events */}
                 <div className="mt-0.5 space-y-0.5 sm:mt-1 sm:space-y-1">
-                  {dayEvents.slice(0, 2).map((event) => (
-                    <button
-                      key={event.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEventClick(event);
-                      }}
-                      className={cn(
-                        "cal-event-chip w-full truncate rounded-md px-1.5 py-0.5 text-left text-[10px] font-medium transition-all duration-200 sm:px-2 sm:text-xs",
-                        searchMatchIds.has(event.id)
-                          ? "bg-gradient-to-r from-gold/40 to-gold/25 text-gold-dark shadow-sm ring-1 ring-gold/50"
-                          : "bg-gradient-to-r from-gold/20 to-gold/10 text-gold-dark hover:from-gold/30 hover:to-gold/20 hover:shadow-sm"
-                      )}
-                    >
-                      <span className="hidden sm:inline">
-                        {event.startTime && (
-                          <span className="mr-1 font-semibold text-gold-dark/60">
-                            {event.startTime}
-                          </span>
+                  {dayEvents.slice(0, 2).map((event) => {
+                    const color = getTipoColor(event.tipo);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEventClick(event);
+                        }}
+                        className={cn(
+                          "cal-event-chip flex w-full items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-left text-[10px] font-medium transition-all duration-200 sm:px-2 sm:text-xs",
+                          searchMatchIds.has(event.id)
+                            ? cn(color.bg, color.text, "shadow-sm ring-1", color.border)
+                            : cn(color.bg, color.text, "hover:shadow-sm")
                         )}
-                        <HighlightText text={event.title} query={searchQuery} />
-                      </span>
-                      <span className="sm:hidden">
-                        <HighlightText text={event.title} query={searchQuery} />
-                      </span>
-                    </button>
-                  ))}
+                      >
+                        <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", color.dot)} />
+                        <span className="hidden truncate sm:inline">
+                          {event.startTime && (
+                            <span className="mr-1 font-semibold opacity-60">
+                              {event.startTime}
+                            </span>
+                          )}
+                          <HighlightText text={event.title} query={searchQuery} />
+                        </span>
+                        <span className="truncate sm:hidden">
+                          <HighlightText text={event.title} query={searchQuery} />
+                        </span>
+                      </button>
+                    );
+                  })}
                   {dayEvents.length > 2 && (
                     <p className="px-1.5 text-[10px] font-medium text-royal/60 sm:px-2 sm:text-xs">
                       +{dayEvents.length - 2} mais
@@ -716,29 +729,35 @@ function WeekView({
 
                 {/* Events */}
                 <div className="space-y-1.5">
-                  {dayEvents.map((event, ei) => (
-                    <button
-                      key={event.id}
-                      onClick={() => onEventClick(event)}
-                      className={cn(
-                        "cal-cell-animate w-full rounded-lg px-2 py-1.5 text-left text-xs transition-all hover:shadow-md",
-                        searchMatchIds.has(event.id)
-                          ? "bg-gradient-to-r from-gold/35 to-gold/20 text-gold-dark shadow-sm ring-1 ring-gold/50"
-                          : "bg-gradient-to-r from-gold/15 to-gold/5 text-gold-dark hover:from-gold/25 hover:to-gold/15"
-                      )}
-                      style={{ animationDelay: `${(i * 50) + (ei * 30)}ms` }}
-                    >
-                      {event.startTime && (
-                        <span className="block text-[10px] font-semibold text-royal/70">
-                          {event.startTime}
-                          {event.endTime && ` – ${event.endTime}`}
+                  {dayEvents.map((event, ei) => {
+                    const color = getTipoColor(event.tipo);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => onEventClick(event)}
+                        className={cn(
+                          "cal-cell-animate w-full rounded-lg border px-2 py-1.5 text-left text-xs transition-all hover:shadow-md",
+                          color.bg, color.text, color.border,
+                          searchMatchIds.has(event.id) && "ring-1 ring-offset-1 shadow-sm"
+                        )}
+                        style={{ animationDelay: `${(i * 50) + (ei * 30)}ms` }}
+                      >
+                        <div className="flex items-center gap-1">
+                          <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", color.dot)} />
+                          <span className="truncate text-[10px] font-medium opacity-70">{event.tipo}</span>
+                        </div>
+                        {event.startTime && (
+                          <span className="block text-[10px] font-semibold opacity-60">
+                            {event.startTime}
+                            {event.endTime && ` – ${event.endTime}`}
+                          </span>
+                        )}
+                        <span className="block truncate font-medium">
+                          <HighlightText text={event.title} query={searchQuery} />
                         </span>
-                      )}
-                      <span className="block truncate font-medium">
-                        <HighlightText text={event.title} query={searchQuery} />
-                      </span>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -818,51 +837,70 @@ function DayView({
           </div>
         ) : (
           <div className="space-y-3">
-            {dayEvents.map((event, i) => (
-              <button
-                key={event.id}
-                onClick={() => onEventClick(event)}
-                className={cn(
-                  "cal-cell-animate group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 hover:shadow-md sm:p-5",
-                  searchMatchIds.has(event.id)
-                    ? "border-gold/40 bg-gradient-to-r from-gold/10 to-gold/5 shadow-sm ring-1 ring-gold/30"
-                    : "border-border/40 hover:border-royal/20 hover:bg-royal/3"
-                )}
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                {/* Time indicator */}
-                {event.startTime && (
+            {dayEvents.map((event, i) => {
+              const color = getTipoColor(event.tipo);
+              return (
+                <button
+                  key={event.id}
+                  onClick={() => onEventClick(event)}
+                  className={cn(
+                    "cal-cell-animate group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 hover:shadow-md sm:p-5",
+                    color.border,
+                    searchMatchIds.has(event.id)
+                      ? cn(color.bg, "shadow-sm ring-1", color.border)
+                      : "hover:bg-muted/30"
+                  )}
+                  style={{ animationDelay: `${i * 60}ms` }}
+                >
+                  {/* Color strip + time */}
                   <div className="shrink-0 pt-0.5">
-                    <div className="rounded-lg bg-royal/10 px-2.5 py-1 text-center">
-                      <span className="text-sm font-bold text-royal">
-                        {event.startTime}
-                      </span>
-                      {event.endTime && (
-                        <span className="block text-[10px] text-royal/60">
-                          {event.endTime}
-                        </span>
+                    <div className={cn("rounded-lg px-2.5 py-1 text-center", color.bg)}>
+                      <span className={cn("h-2 w-2 mx-auto mb-1 block rounded-full", color.dot)} />
+                      {event.startTime && (
+                        <>
+                          <span className={cn("text-sm font-bold", color.text)}>
+                            {event.startTime}
+                          </span>
+                          {event.endTime && (
+                            <span className={cn("block text-[10px] opacity-60", color.text)}>
+                              {event.endTime}
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
-                )}
 
-                {/* Content */}
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-semibold text-foreground transition-colors group-hover:text-royal">
-                    <HighlightText text={event.title} query={searchQuery} />
-                  </h4>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                    <HighlightText text={event.description} query={searchQuery} />
-                  </p>
-                  {event.location && (
-                    <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground/80">
-                      <MapPin className="h-3 w-3" />
-                      <HighlightText text={event.location} query={searchQuery} />
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-foreground transition-colors group-hover:text-royal">
+                        <HighlightText text={event.title} query={searchQuery} />
+                      </h4>
+                      <span className={cn(
+                        "shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                        color.bg, color.text, color.border
+                      )}>
+                        {event.tipo}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                      <HighlightText text={event.description} query={searchQuery} />
                     </p>
-                  )}
-                </div>
-              </button>
-            ))}
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground/80">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        <HighlightText text={event.local} query={searchQuery} />
+                      </span>
+                      <span className="opacity-50">|</span>
+                      <span>
+                        <HighlightText text={event.pastoral} query={searchQuery} />
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -949,8 +987,10 @@ function YearView({
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const day = i + 1;
                   const dateStr = formatDateStr(year, m, day);
-                  const hasEvent = monthEvents.some((e) => e.date === dateStr);
+                  const dayEvts = monthEvents.filter((e) => e.date === dateStr);
+                  const hasEvent = dayEvts.length > 0;
                   const isToday = dateStr === todayStr;
+                  const firstColor = hasEvent ? getTipoColor(dayEvts[0].tipo) : null;
 
                   return (
                     <span
@@ -958,7 +998,7 @@ function YearView({
                       className={cn(
                         "flex h-4 w-4 items-center justify-center rounded-full text-[9px] transition-colors sm:h-5 sm:w-5 sm:text-[10px]",
                         isToday && "bg-royal font-bold text-white shadow-sm",
-                        hasEvent && !isToday && "bg-gold/25 font-semibold text-gold-dark"
+                        hasEvent && !isToday && firstColor && cn(firstColor.bg, "font-semibold", firstColor.text)
                       )}
                     >
                       {day}

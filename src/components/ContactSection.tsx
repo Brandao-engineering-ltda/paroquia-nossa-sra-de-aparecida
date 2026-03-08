@@ -78,7 +78,7 @@ export function ContactSection() {
         <div className="mt-12 overflow-hidden rounded-2xl border border-border/50 shadow-lg">
           <iframe
             title="Localização da Paróquia Nossa Senhora Aparecida"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3661.5!2d-51.9386!3d-23.4206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ecd70e49c1c1c1%3A0x2e0e0e0e0e0e0e0e!2sPar%C3%B3quia%20Nossa%20Senhora%20Aparecida%20-%20Vila%20Esperan%C3%A7a%2C%20Maring%C3%A1%20-%20PR!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr"
+            src="https://www.google.com/maps?q=Praça+Nossa+Senhora+Aparecida,+s/n,+Vila+Esperança,+Maringá,+PR&output=embed"
             width="100%"
             height="400"
             style={{ border: 0 }}
