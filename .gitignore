@@ -42,6 +42,10 @@ yarn-error.log*
 *.db
 *.db-journal
 
+# uploads
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # vercel
 .vercel
 

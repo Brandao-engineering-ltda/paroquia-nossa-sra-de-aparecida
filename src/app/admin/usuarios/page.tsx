@@ -18,7 +18,7 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-navy">
+      <h1 className="mb-6 text-2xl font-bold text-foreground">
         Gerenciar Usuários
       </h1>
       <UserTable initialUsers={users} />

@@ -28,14 +28,14 @@ const contactInfo = [
 
 export function ContactSection() {
   return (
-    <section id="contato" className="bg-white py-20">
+    <section id="contato" className="bg-secondary py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gold/10 px-4 py-1.5 text-sm font-medium text-gold-dark">
             <MapPin className="h-4 w-4" />
             Localização
           </div>
-          <h2 className="text-3xl font-bold text-navy sm:text-4xl">
+          <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
             Entre em Contato
           </h2>
           <p className="mt-3 text-muted-foreground">
@@ -53,7 +53,7 @@ export function ContactSection() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-royal to-navy text-white">
                   <info.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mb-2 font-semibold text-navy">{info.title}</h3>
+                <h3 className="mb-2 font-semibold text-foreground">{info.title}</h3>
                 {info.lines.map((line) => (
                   <p
                     key={line}

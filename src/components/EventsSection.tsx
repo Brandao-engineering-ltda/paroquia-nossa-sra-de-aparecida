@@ -1,6 +1,7 @@
 import { CalendarDays } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { BannerShowcase } from "@/components/BannerShowcase";
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr + "T12:00:00");
@@ -12,22 +13,33 @@ function formatDate(dateStr: string) {
 }
 
 export async function EventsSection() {
-  const today = new Date().toISOString().split("T")[0];
-  const events = await prisma.event.findMany({
-    where: { date: { gte: today } },
-    orderBy: { date: "asc" },
-    take: 3,
-  });
+  const [banners, events] = await Promise.all([
+    prisma.banner.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.event.findMany({
+      where: { date: { gte: new Date().toISOString().split("T")[0] } },
+      orderBy: { date: "asc" },
+      take: 3,
+    }),
+  ]);
 
+  // If there are banners, show the showcase
+  if (banners.length > 0) {
+    return <BannerShowcase banners={banners} />;
+  }
+
+  // Fallback: show upcoming events as simple cards
   return (
-    <section id="eventos" className="bg-ice py-20">
+    <section id="eventos" className="bg-background py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-royal/10 px-4 py-1.5 text-sm font-medium text-royal">
             <CalendarDays className="h-4 w-4" />
             Agenda
           </div>
-          <h2 className="text-3xl font-bold text-navy sm:text-4xl">
+          <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
             Próximos Eventos
           </h2>
           <p className="mt-3 text-muted-foreground">
@@ -47,7 +59,7 @@ export async function EventsSection() {
                   <CalendarDays className="h-3 w-3" />
                   {formatDate(event.date)}
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-navy group-hover:text-royal">
+                <h3 className="mb-2 text-lg font-semibold text-foreground group-hover:text-royal">
                   {event.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">

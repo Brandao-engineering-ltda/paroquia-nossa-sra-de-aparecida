@@ -1,25 +1,16 @@
-import { Header } from "@/components/Header";
-import { HeroSection } from "@/components/HeroSection";
-import { MassScheduleSection } from "@/components/MassScheduleSection";
-import { AboutSection } from "@/components/AboutSection";
+import { Suspense } from "react";
 import { EventsSection } from "@/components/EventsSection";
-import { ContactSection } from "@/components/ContactSection";
-import { Footer } from "@/components/Footer";
+import { HomeContent } from "@/components/HomeContent";
+import { EventsSkeleton } from "@/components/skeletons/EventsSkeleton";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1">
-        <HeroSection />
-        <MassScheduleSection />
-        <AboutSection />
+    <HomeContent>
+      <Suspense fallback={<EventsSkeleton />}>
         <EventsSection />
-        <ContactSection />
-      </main>
-      <Footer />
-    </div>
+      </Suspense>
+    </HomeContent>
   );
 }

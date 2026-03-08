@@ -52,7 +52,7 @@ export function AdminEventList({
   }
 
   return (
-    <div className="rounded-lg border border-border/50 bg-white">
+    <div className="overflow-x-auto rounded-lg border border-border/50 bg-card">
       <Table>
         <TableHeader>
           <TableRow>
