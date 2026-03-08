@@ -142,7 +142,9 @@ describe("POST /api/eventos", () => {
       date: "2026-04-15",
       startTime: null,
       endTime: null,
-      location: null,
+      pastoral: "Liturgia",
+      tipo: "Missa",
+      local: "Matriz - Igreja",
       createdById: "u1",
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -151,7 +153,7 @@ describe("POST /api/eventos", () => {
     const req = new Request("http://localhost/api/eventos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "Test", description: "Desc", date: "2026-04-15" }),
+      body: JSON.stringify({ title: "Test", description: "Desc", date: "2026-04-15", pastoral: "Liturgia", tipo: "Missa", local: "Matriz - Igreja" }),
     });
 
     const res = await POST(req);

@@ -7,7 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CalendarDays, Clock, MapPin, User, Pencil, Trash2 } from "lucide-react";
+import { CalendarDays, Clock, MapPin, User, Pencil, Trash2, Tag, Users } from "lucide-react";
+import { getTipoColor } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface EventData {
   id: string;
@@ -16,7 +18,9 @@ interface EventData {
   date: string;
   startTime: string | null;
   endTime: string | null;
-  location: string | null;
+  pastoral: string;
+  tipo: string;
+  local: string;
   createdBy: { id: string; name: string };
 }
 
@@ -49,6 +53,7 @@ export function EventDetail({
 }: EventDetailProps) {
   const canModify =
     currentUserRole === "admin" || currentUserId === event.createdBy.id;
+  const tipoColor = getTipoColor(event.tipo);
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -58,11 +63,35 @@ export function EventDetail({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Tipo badge */}
+          <div className={cn(
+            "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold",
+            tipoColor.bg, tipoColor.text, tipoColor.border
+          )}>
+            <span className={cn("h-2 w-2 rounded-full", tipoColor.dot)} />
+            {event.tipo}
+          </div>
+
           <p className="text-sm leading-relaxed text-muted-foreground">
             {event.description}
           </p>
 
           <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-foreground">
+              <Users className="h-4 w-4 text-royal" />
+              {event.pastoral}
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-foreground">
+              <Tag className="h-4 w-4 text-royal" />
+              {event.tipo}
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-foreground">
+              <MapPin className="h-4 w-4 text-royal" />
+              {event.local}
+            </div>
+
             <div className="flex items-center gap-2 text-sm text-foreground">
               <CalendarDays className="h-4 w-4 text-royal" />
               {formatDate(event.date)}
@@ -73,13 +102,6 @@ export function EventDetail({
                 <Clock className="h-4 w-4 text-royal" />
                 {event.startTime}
                 {event.endTime && ` — ${event.endTime}`}
-              </div>
-            )}
-
-            {event.location && (
-              <div className="flex items-center gap-2 text-sm text-foreground">
-                <MapPin className="h-4 w-4 text-royal" />
-                {event.location}
               </div>
             )}
 

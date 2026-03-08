@@ -25,7 +25,9 @@ const baseEvent = {
   date: "2026-04-15",
   startTime: "10:00",
   endTime: "11:00",
-  location: "Igreja Principal",
+  pastoral: "Liturgia",
+  tipo: "Missa",
+  local: "Matriz - Igreja",
   createdBy: { id: "u1", name: "João" },
 };
 
@@ -60,7 +62,7 @@ describe("EventDetail", () => {
     expect(screen.getByText(/11:00/)).toBeInTheDocument();
   });
 
-  it("renders event location", () => {
+  it("renders event local, pastoral and tipo", () => {
     render(
       <EventDetail
         event={baseEvent}
@@ -69,7 +71,9 @@ describe("EventDetail", () => {
         onDelete={onDelete}
       />
     );
-    expect(screen.getByText("Igreja Principal")).toBeInTheDocument();
+    expect(screen.getByText("Matriz - Igreja")).toBeInTheDocument();
+    expect(screen.getByText("Liturgia")).toBeInTheDocument();
+    expect(screen.getAllByText("Missa").length).toBeGreaterThan(0);
   });
 
   it("renders author name", () => {
@@ -159,16 +163,16 @@ describe("EventDetail", () => {
     expect(onDelete).toHaveBeenCalledWith("e1");
   });
 
-  it("does not render location if absent", () => {
-    const eventNoLocation = { ...baseEvent, location: null };
+  it("renders tipo badge with color", () => {
     render(
       <EventDetail
-        event={eventNoLocation}
+        event={baseEvent}
         onClose={onClose}
         onEdit={onEdit}
         onDelete={onDelete}
       />
     );
-    expect(screen.queryByText("Igreja Principal")).not.toBeInTheDocument();
+    // Tipo "Missa" should appear as a badge and in the details
+    expect(screen.getAllByText("Missa").length).toBeGreaterThanOrEqual(2);
   });
 });

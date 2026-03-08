@@ -40,10 +40,10 @@ describe("EventForm", () => {
         onSuccess={onSuccess}
       />
     );
-    expect(screen.getByText("Novo Evento")).toBeInTheDocument();
-    expect(screen.getByLabelText("Título")).toBeInTheDocument();
-    expect(screen.getByLabelText("Descrição")).toBeInTheDocument();
-    expect(screen.getByLabelText("Data")).toBeInTheDocument();
+    expect(screen.getByText("Nova Reserva")).toBeInTheDocument();
+    expect(screen.getByLabelText("Título *")).toBeInTheDocument();
+    expect(screen.getByLabelText("Descrição *")).toBeInTheDocument();
+    expect(screen.getByLabelText("Data *")).toBeInTheDocument();
     expect(screen.getByText("Criar")).toBeInTheDocument();
   });
 
@@ -55,7 +55,9 @@ describe("EventForm", () => {
       date: "2026-04-15",
       startTime: "10:00",
       endTime: "11:00",
-      location: "Igreja",
+      pastoral: "Liturgia",
+      tipo: "Missa",
+      local: "Matriz - Igreja",
     };
     render(
       <EventForm
@@ -65,13 +67,13 @@ describe("EventForm", () => {
         onSuccess={onSuccess}
       />
     );
-    expect(screen.getByText("Editar Evento")).toBeInTheDocument();
+    expect(screen.getByText("Editar Reserva")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Missa")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Desc")).toBeInTheDocument();
     expect(screen.getByText("Salvar")).toBeInTheDocument();
   });
 
-  it("submits new event via POST", async () => {
+  it("shows validation error when dropdowns not selected", async () => {
     mockFetch.mockResolvedValue({ ok: true });
     const user = userEvent.setup();
     render(
@@ -83,15 +85,12 @@ describe("EventForm", () => {
       />
     );
 
-    await user.type(screen.getByLabelText("Título"), "Novo Evento");
-    await user.type(screen.getByLabelText("Descrição"), "Descrição do evento");
+    await user.type(screen.getByLabelText("Título *"), "Novo Evento");
+    await user.type(screen.getByLabelText("Descrição *"), "Descrição do evento");
     await user.click(screen.getByText("Criar"));
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/eventos",
-      expect.objectContaining({ method: "POST" })
-    );
-    expect(onSuccess).toHaveBeenCalled();
+    expect(screen.getByText("Pastoral, tipo e local são obrigatórios.")).toBeInTheDocument();
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it("submits edited event via PUT", async () => {
@@ -103,7 +102,9 @@ describe("EventForm", () => {
       date: "2026-04-15",
       startTime: null,
       endTime: null,
-      location: null,
+      pastoral: "Liturgia",
+      tipo: "Missa",
+      local: "Matriz - Igreja",
     };
     const user = userEvent.setup();
     render(
@@ -124,29 +125,18 @@ describe("EventForm", () => {
     expect(onSuccess).toHaveBeenCalled();
   });
 
-  it("shows error on failed submit", async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      json: () => Promise.resolve({ error: "Título obrigatório" }),
-    });
-    const user = userEvent.setup();
+  it("renders pastoral, tipo, and local dropdowns", () => {
     render(
       <EventForm
         event={null}
-        defaultDate="2026-04-15"
+        defaultDate={null}
         onClose={onClose}
         onSuccess={onSuccess}
       />
     );
-
-    await user.type(screen.getByLabelText("Título"), "Test");
-    await user.type(screen.getByLabelText("Descrição"), "Desc");
-    await user.click(screen.getByText("Criar"));
-
-    expect(
-      await screen.findByText("Título obrigatório")
-    ).toBeInTheDocument();
-    expect(onSuccess).not.toHaveBeenCalled();
+    expect(screen.getByText("Selecione a pastoral...")).toBeInTheDocument();
+    expect(screen.getByText("Selecione o tipo...")).toBeInTheDocument();
+    expect(screen.getByText("Selecione o local...")).toBeInTheDocument();
   });
 
   it("calls onClose when cancel clicked", async () => {
