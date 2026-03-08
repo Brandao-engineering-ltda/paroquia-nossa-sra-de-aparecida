@@ -1,6 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { Instagram, Facebook, Phone } from "lucide-react";
+
+const socialLinks = [
+  {
+    href: "https://www.instagram.com/pnsa_mga/",
+    icon: Instagram,
+    label: "Instagram",
+  },
+  {
+    href: "https://www.facebook.com/pnsa.maringa/",
+    icon: Facebook,
+    label: "Facebook",
+  },
+  {
+    href: "https://wa.me/5544984230760",
+    icon: Phone,
+    label: "WhatsApp",
+  },
+];
 
 export function Footer() {
   return (
@@ -22,6 +41,20 @@ export function Footer() {
               Paróquia Nossa Senhora Aparecida — Celebrando 25 anos de fé e
               comunidade em Maringá, PR.
             </p>
+            <div className="mt-4 flex gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-gold/80 hover:text-navy"
+                >
+                  <social.icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Quick Links */}
@@ -57,9 +90,15 @@ export function Footer() {
               Arquidiocese de Maringá
             </p>
             <p className="mt-1 text-sm text-light-blue/70">
-              Maringá — Paraná, Brasil
+              Pç. Nossa Senhora Aparecida, s/n
             </p>
-            <p className="mt-4 text-sm text-light-blue/70">
+            <p className="text-sm text-light-blue/70">
+              Vila Esperança — Maringá, PR
+            </p>
+            <p className="mt-1 text-sm text-light-blue/70">
+              (44) 3267-0484
+            </p>
+            <p className="mt-4 text-sm italic text-light-blue/50">
               &quot;Maria, Mãe de Deus, rogai por nós.&quot;
             </p>
           </div>
