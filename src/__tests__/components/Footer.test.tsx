@@ -17,14 +17,22 @@ describe("Footer", () => {
     expect(screen.getByText("Horários das Missas")).toBeInTheDocument();
   });
 
-  it("renders parish info", () => {
+  it("renders parish info with address", () => {
     render(<Footer />);
     expect(
       screen.getByText("Arquidiocese de Maringá")
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Maringá — Paraná, Brasil")
+      screen.getByText("Pç. Nossa Senhora Aparecida, s/n")
     ).toBeInTheDocument();
+    expect(screen.getByText("(44) 3267-0484")).toBeInTheDocument();
+  });
+
+  it("renders social media links", () => {
+    render(<Footer />);
+    expect(screen.getByLabelText("Instagram")).toBeInTheDocument();
+    expect(screen.getByLabelText("Facebook")).toBeInTheDocument();
+    expect(screen.getByLabelText("WhatsApp")).toBeInTheDocument();
   });
 
   it("renders copyright with current year", () => {
