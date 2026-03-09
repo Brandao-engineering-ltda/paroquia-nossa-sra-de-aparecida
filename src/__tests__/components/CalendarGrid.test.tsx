@@ -142,4 +142,107 @@ describe("CalendarGrid", () => {
       expect(screen.getAllByText("Evento Teste").length).toBeGreaterThan(0);
     });
   });
+
+  it("renders Filtro button", async () => {
+    render(<CalendarGrid />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Filtro/ })).toBeInTheDocument();
+    });
+  });
+
+  it("renders Hoje button", async () => {
+    render(<CalendarGrid />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Hoje/ })).toBeInTheDocument();
+    });
+  });
+
+  it("opens filter modal when clicking Filtro button", async () => {
+    render(<CalendarGrid />);
+    const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Filtro/ })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /Filtro/ }));
+
+    // Filter modal should appear with Aplicar and Cancelar buttons
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Aplicar/ })).toBeInTheDocument();
+    });
+  });
+
+  it("closes filter modal when clicking the X button", async () => {
+    render(<CalendarGrid />);
+    const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Filtro/ })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /Filtro/ }));
+    await waitFor(() => {
+      expect(screen.getByText("Filtrar Eventos")).toBeInTheDocument();
+    });
+
+    // Click the X icon button (has an svg child, no text)
+    const xBtn = screen
+      .getAllByRole("button")
+      .find((btn) => btn.querySelector(".lucide-x") !== null);
+    expect(xBtn).toBeDefined();
+    await user.click(xBtn!);
+    await waitFor(() => {
+      expect(screen.queryByText("Filtrar Eventos")).not.toBeInTheDocument();
+    });
+  });
+
+  it("closes filter modal when clicking Aplicar", async () => {
+    render(<CalendarGrid />);
+    const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Filtro/ })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /Filtro/ }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Aplicar/ })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /Aplicar/ }));
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: /Aplicar/ })).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows search input when clicking search icon", async () => {
+    render(<CalendarGrid />);
+    const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Filtro/ })).toBeInTheDocument();
+    });
+
+    // Find the search toggle button by its lucide-search icon
+    const searchBtn = screen.getAllByRole("button").find(
+      (btn) => btn.querySelector(".lucide-search") !== null
+    );
+    expect(searchBtn).toBeDefined();
+    await user.click(searchBtn!);
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/Buscar eventos/i)).toBeInTheDocument();
+    });
+  });
+
+  it("does not show filter badge when no filter is active", async () => {
+    render(<CalendarGrid />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Filtro/ })).toBeInTheDocument();
+    });
+    // Gold dot badge should not be present when no filter active
+    const filtroBtn = screen.getByRole("button", { name: /Filtro/ });
+    // The badge is a span with specific classes — check aria or structure
+    expect(filtroBtn.querySelector(".bg-gold")).not.toBeInTheDocument();
+  });
 });

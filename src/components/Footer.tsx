@@ -106,7 +106,7 @@ export function Footer() {
 
         <Separator className="my-8 bg-white/10" />
 
-        <p className="text-center text-xs text-light-blue/50">
+        <p className="text-center text-xs text-light-blue/50" suppressHydrationWarning>
           &copy; {new Date().getFullYear()} Paróquia Nossa Senhora Aparecida —
           Maringá, PR. Todos os direitos reservados.
         </p>
