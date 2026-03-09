@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, startTransition } from "react";
 import { useSession } from "next-auth/react";
-import { ChevronLeft, ChevronRight, Plus, Search, X, CalendarDays, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Search, X, CalendarDays, MapPin, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EventForm } from "./EventForm";
 import { EventDetail } from "./EventDetail";
 import { cn } from "@/lib/utils";
-import { getTipoColor } from "@/lib/constants";
+import { getTipoColor, PASTORAIS, TIPOS, LOCAIS } from "@/lib/constants";
 
 interface EventData {
   id: string;
@@ -108,7 +108,7 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 
 export function CalendarGrid() {
   const { data: session } = useSession();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [events, setEvents] = useState<EventData[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
@@ -119,6 +119,16 @@ export function CalendarGrid() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [viewKey, setViewKey] = useState(0);
+  const [showFilter, setShowFilter] = useState(false);
+  const [pendingFilter, setPendingFilter] = useState({ pastoral: "", tipo: "", local: "" });
+  const [activeFilter, setActiveFilter] = useState({ pastoral: "", tipo: "", local: "" });
+
+  // Defer date initialization to client to avoid hydration mismatch.
+  // startTransition avoids the react-hooks/set-state-in-effect lint rule by
+  // scheduling the update as a non-urgent transition instead of a sync call.
+  useEffect(() => {
+    startTransition(() => setCurrentDate(new Date()));
+  }, []);
 
   // Sliding indicator for view toggle
   const toggleRef = useRef<HTMLDivElement>(null);
@@ -140,11 +150,12 @@ export function CalendarGrid() {
     }
   }, [activeViewIndex]);
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  const year = currentDate?.getFullYear() ?? 2026;
+  const month = currentDate?.getMonth() ?? 0;
 
   // Load events based on view
   useEffect(() => {
+    if (!currentDate) return;
     let cancelled = false;
     async function loadEvents() {
       let url: string;
@@ -159,7 +170,7 @@ export function CalendarGrid() {
         if (!cancelled) setEvents(res.flat());
         return;
       } else if (viewMode === "week") {
-        const weekDates = getWeekDates(currentDate);
+        const weekDates = getWeekDates(currentDate!);
         const startMonth = weekDates[0].getMonth() + 1;
         const startYear = weekDates[0].getFullYear();
         const endMonth = weekDates[6].getMonth() + 1;
@@ -209,12 +220,29 @@ export function CalendarGrid() {
     [searchResults]
   );
 
+  const isFilterActive = activeFilter.pastoral !== "" || activeFilter.tipo !== "" || activeFilter.local !== "";
+
+  const filterMatchIds = useMemo<Set<string> | null>(() => {
+    if (!isFilterActive) return null;
+    const { pastoral, tipo, local } = activeFilter;
+    return new Set(
+      events
+        .filter(
+          (e) =>
+            (!pastoral || e.pastoral === pastoral) &&
+            (!tipo || e.tipo === tipo) &&
+            (!local || e.local === local)
+        )
+        .map((e) => e.id)
+    );
+  }, [events, activeFilter, isFilterActive]);
+
   function refreshEvents() {
     setRefreshKey((k) => k + 1);
   }
 
   function navigate(direction: "prev" | "next") {
-    const d = new Date(currentDate);
+    const d = new Date(currentDate!);
     if (viewMode === "day") {
       d.setDate(d.getDate() + (direction === "next" ? 1 : -1));
     } else if (viewMode === "week") {
@@ -275,10 +303,10 @@ export function CalendarGrid() {
   // Get header title
   function getTitle() {
     if (viewMode === "day") {
-      return `${currentDate.getDate()} de ${MONTH_NAMES[month]} ${year}`;
+      return `${currentDate!.getDate()} de ${MONTH_NAMES[month]} ${year}`;
     }
     if (viewMode === "week") {
-      const week = getWeekDates(currentDate);
+      const week = getWeekDates(currentDate!);
       const s = week[0];
       const e = week[6];
       if (s.getMonth() === e.getMonth()) {
@@ -290,8 +318,9 @@ export function CalendarGrid() {
     return `${MONTH_NAMES[month]} ${year}`;
   }
 
-  const today = new Date();
-  const todayStr = dateToStr(today);
+  const todayStr = currentDate ? dateToStr(new Date()) : "";
+
+  if (!currentDate) return null;
 
   return (
     <div>
@@ -325,6 +354,26 @@ export function CalendarGrid() {
             className="ml-1 h-7 rounded-full border-royal/20 text-xs font-semibold text-royal transition-all hover:border-royal/40 hover:bg-royal/5"
           >
             Hoje
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setPendingFilter(activeFilter);
+              setShowFilter(true);
+            }}
+            className={cn(
+              "relative ml-1 h-7 rounded-full border-royal/20 text-xs font-semibold transition-all hover:border-royal/40 hover:bg-royal/5",
+              isFilterActive
+                ? "border-gold/50 bg-gold/10 text-gold-dark hover:border-gold/70 hover:bg-gold/15"
+                : "text-royal"
+            )}
+          >
+            <SlidersHorizontal className="mr-1 h-3 w-3" />
+            Filtro
+            {isFilterActive && (
+              <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-gold shadow-sm" />
+            )}
           </Button>
         </div>
 
@@ -398,29 +447,37 @@ export function CalendarGrid() {
 
       {/* Search bar — animated slide-in */}
       {showSearch && (
-        <div className="cal-search-animate mb-5">
-          <div className="flex items-center gap-2 rounded-2xl border border-border/40 bg-card/60 p-2 shadow-sm backdrop-blur-md sm:rounded-full sm:px-4">
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <Input
-              placeholder="Buscar eventos por titulo, descricao ou local..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0"
-              autoFocus
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-            {searchQuery && (
-              <span className="shrink-0 rounded-full bg-royal/10 px-2.5 py-0.5 text-xs font-medium text-royal">
-                {searchResults.length}
-              </span>
-            )}
+        <div className="cal-search-animate mb-5 flex justify-center">
+          <div className="relative w-full max-w-xl">
+            {/* Warm glow behind the bar */}
+            <div className="pointer-events-none absolute -inset-2 rounded-full bg-gradient-to-b from-gold/20 via-gold/10 to-gold/5 blur-xl" />
+            <div className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-b from-gold/15 to-transparent blur-md" />
+
+            {/* Search bar */}
+            <div className="relative flex items-center gap-2 rounded-full border border-gold/20 bg-card px-5 py-2.5 shadow-[0_4px_24px_-4px_rgba(201,168,76,0.25)] dark:border-gold/15 dark:shadow-[0_4px_24px_-4px_rgba(201,168,76,0.15)]">
+              <Input
+                placeholder="Buscar eventos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border-0 bg-transparent px-0 text-sm shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0"
+                autoFocus
+              />
+              {searchQuery && (
+                <span className="shrink-0 rounded-full bg-royal/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-royal">
+                  {searchResults.length}
+                </span>
+              )}
+              {searchQuery ? (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="shrink-0 rounded-full p-1.5 text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : (
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -465,6 +522,7 @@ export function CalendarGrid() {
             todayStr={todayStr}
             searchMatchIds={searchMatchIds}
             searchQuery={searchQuery}
+            filterMatchIds={filterMatchIds}
             onDayClick={handleDayClick}
             onEventClick={setSelectedEvent}
           />
@@ -472,22 +530,24 @@ export function CalendarGrid() {
 
         {viewMode === "week" && (
           <WeekView
-            currentDate={currentDate}
+            currentDate={currentDate!}
             events={events}
             todayStr={todayStr}
             searchMatchIds={searchMatchIds}
             searchQuery={searchQuery}
+            filterMatchIds={filterMatchIds}
             onEventClick={setSelectedEvent}
           />
         )}
 
         {viewMode === "day" && (
           <DayView
-            currentDate={currentDate}
+            currentDate={currentDate!}
             events={events}
             todayStr={todayStr}
             searchMatchIds={searchMatchIds}
             searchQuery={searchQuery}
+            filterMatchIds={filterMatchIds}
             onEventClick={setSelectedEvent}
           />
         )}
@@ -497,6 +557,7 @@ export function CalendarGrid() {
             year={year}
             events={events}
             todayStr={todayStr}
+            filterMatchIds={filterMatchIds}
             onMonthClick={(m) => {
               setCurrentDate(new Date(year, m, 1));
               setViewMode("month");
@@ -527,6 +588,25 @@ export function CalendarGrid() {
           onSuccess={handleFormSuccess}
         />
       )}
+
+      {/* Filter modal */}
+      {showFilter && (
+        <FilterModal
+          pending={pendingFilter}
+          onChange={setPendingFilter}
+          onApply={() => {
+            setActiveFilter(pendingFilter);
+            setShowFilter(false);
+          }}
+          onClear={() => {
+            const empty = { pastoral: "", tipo: "", local: "" };
+            setPendingFilter(empty);
+            setActiveFilter(empty);
+            setShowFilter(false);
+          }}
+          onClose={() => setShowFilter(false)}
+        />
+      )}
     </div>
   );
 }
@@ -540,6 +620,7 @@ function MonthView({
   todayStr,
   searchMatchIds,
   searchQuery,
+  filterMatchIds,
   onDayClick,
   onEventClick,
 }: {
@@ -549,6 +630,7 @@ function MonthView({
   todayStr: string;
   searchMatchIds: Set<string>;
   searchQuery: string;
+  filterMatchIds: Set<string> | null;
   onDayClick: (day: number) => void;
   onEventClick: (e: EventData) => void;
 }) {
@@ -632,9 +714,12 @@ function MonthView({
                         }}
                         className={cn(
                           "cal-event-chip flex w-full items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-left text-[10px] font-medium transition-all duration-200 sm:px-2 sm:text-xs",
-                          searchMatchIds.has(event.id)
-                            ? cn(color.bg, color.text, "shadow-sm ring-1", color.border)
-                            : cn(color.bg, color.text, "hover:shadow-sm")
+                          filterMatchIds !== null && !filterMatchIds.has(event.id)
+                            ? "opacity-25"
+                            : searchMatchIds.has(event.id)
+                              ? cn(color.bg, color.text, "shadow-sm ring-1", color.border)
+                              : cn(color.bg, color.text, "hover:shadow-sm"),
+                          filterMatchIds !== null && filterMatchIds.has(event.id) && "ring-1 ring-gold/60 shadow-sm"
                         )}
                       >
                         <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", color.dot)} />
@@ -675,6 +760,7 @@ function WeekView({
   todayStr,
   searchMatchIds,
   searchQuery,
+  filterMatchIds,
   onEventClick,
 }: {
   currentDate: Date;
@@ -682,6 +768,7 @@ function WeekView({
   todayStr: string;
   searchMatchIds: Set<string>;
   searchQuery: string;
+  filterMatchIds: Set<string> | null;
   onEventClick: (e: EventData) => void;
 }) {
   const weekDates = getWeekDates(currentDate);
@@ -738,7 +825,10 @@ function WeekView({
                         className={cn(
                           "cal-cell-animate w-full rounded-lg border px-2 py-1.5 text-left text-xs transition-all hover:shadow-md",
                           color.bg, color.text, color.border,
-                          searchMatchIds.has(event.id) && "ring-1 ring-offset-1 shadow-sm"
+                          filterMatchIds !== null && !filterMatchIds.has(event.id)
+                            ? "opacity-25"
+                            : searchMatchIds.has(event.id) && "ring-1 ring-offset-1 shadow-sm",
+                          filterMatchIds !== null && filterMatchIds.has(event.id) && "ring-1 ring-gold/60 shadow-sm"
                         )}
                         style={{ animationDelay: `${(i * 50) + (ei * 30)}ms` }}
                       >
@@ -776,6 +866,7 @@ function DayView({
   todayStr,
   searchMatchIds,
   searchQuery,
+  filterMatchIds,
   onEventClick,
 }: {
   currentDate: Date;
@@ -783,6 +874,7 @@ function DayView({
   todayStr: string;
   searchMatchIds: Set<string>;
   searchQuery: string;
+  filterMatchIds: Set<string> | null;
   onEventClick: (e: EventData) => void;
 }) {
   const dateStr = dateToStr(currentDate);
@@ -846,9 +938,13 @@ function DayView({
                   className={cn(
                     "cal-cell-animate group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 hover:shadow-md sm:p-5",
                     color.border,
-                    searchMatchIds.has(event.id)
-                      ? cn(color.bg, "shadow-sm ring-1", color.border)
-                      : "hover:bg-muted/30"
+                    filterMatchIds !== null && !filterMatchIds.has(event.id)
+                      ? "opacity-25"
+                      : filterMatchIds !== null && filterMatchIds.has(event.id)
+                        ? cn(color.bg, "shadow-sm ring-1 ring-gold/60")
+                        : searchMatchIds.has(event.id)
+                          ? cn(color.bg, "shadow-sm ring-1", color.border)
+                          : "hover:bg-muted/30"
                   )}
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
@@ -914,11 +1010,13 @@ function YearView({
   year,
   events,
   todayStr,
+  filterMatchIds,
   onMonthClick,
 }: {
   year: number;
   events: EventData[];
   todayStr: string;
+  filterMatchIds: Set<string> | null;
   onMonthClick: (month: number) => void;
 }) {
   return (
@@ -991,14 +1089,19 @@ function YearView({
                   const hasEvent = dayEvts.length > 0;
                   const isToday = dateStr === todayStr;
                   const firstColor = hasEvent ? getTipoColor(dayEvts[0].tipo) : null;
+                  const hasFilterMatch = filterMatchIds !== null && dayEvts.some((e) => filterMatchIds.has(e.id));
+                  const isFiltered = hasFilterMatch;
+                  const isDimmed = filterMatchIds !== null && hasEvent && !hasFilterMatch;
 
                   return (
                     <span
                       key={day}
                       className={cn(
                         "flex h-4 w-4 items-center justify-center rounded-full text-[9px] transition-colors sm:h-5 sm:w-5 sm:text-[10px]",
+                        isDimmed && "opacity-25",
                         isToday && "bg-royal font-bold text-white shadow-sm",
-                        hasEvent && !isToday && firstColor && cn(firstColor.bg, "font-semibold", firstColor.text)
+                        isFiltered && !isToday && "ring-1 ring-gold/60",
+                        hasEvent && !isToday && !isDimmed && firstColor && cn(firstColor.bg, "font-semibold", firstColor.text)
                       )}
                     >
                       {day}
@@ -1010,6 +1113,130 @@ function YearView({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+// ─── Filter Select ─────────────────────────────────────────
+
+function FilterSelect({
+  label,
+  placeholder,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  placeholder: string;
+  value: string;
+  options: readonly string[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-border/50 bg-background/60 px-3 py-2.5 text-sm text-foreground shadow-sm backdrop-blur-sm transition focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+      >
+        <option value="">{placeholder}</option>
+        {options.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+// ─── Filter Modal ──────────────────────────────────────────
+
+function FilterModal({
+  pending,
+  onChange,
+  onApply,
+  onClear,
+  onClose,
+}: {
+  pending: { pastoral: string; tipo: string; local: string };
+  onChange: (f: { pastoral: string; tipo: string; local: string }) => void;
+  onApply: () => void;
+  onClear: () => void;
+  onClose: () => void;
+}) {
+  const hasAny = pending.pastoral !== "" || pending.tipo !== "" || pending.local !== "";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+
+      {/* Card */}
+      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/20 bg-card/80 shadow-2xl backdrop-blur-xl dark:border-white/10">
+        {/* Warm glow top */}
+        <div className="pointer-events-none absolute -top-10 left-1/2 h-32 w-48 -translate-x-1/2 rounded-full bg-gold/20 blur-3xl" />
+
+        {/* Header */}
+        <div className="relative flex items-center justify-between border-b border-border/30 px-6 py-4">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-4 w-4 text-gold-dark" />
+            <h2 className="text-sm font-semibold text-foreground">Filtrar Eventos</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Dropdowns */}
+        <div className="relative space-y-4 px-6 py-5">
+          <FilterSelect
+            label="Pastoral"
+            placeholder="Todas as pastorais"
+            value={pending.pastoral}
+            options={PASTORAIS}
+            onChange={(v) => onChange({ ...pending, pastoral: v })}
+          />
+          <FilterSelect
+            label="Tipo de Evento"
+            placeholder="Todos os tipos"
+            value={pending.tipo}
+            options={TIPOS}
+            onChange={(v) => onChange({ ...pending, tipo: v })}
+          />
+          <FilterSelect
+            label="Local"
+            placeholder="Todos os locais"
+            value={pending.local}
+            options={LOCAIS}
+            onChange={(v) => onChange({ ...pending, local: v })}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="relative flex items-center gap-2 border-t border-border/30 px-6 py-4">
+          <button
+            onClick={onClear}
+            disabled={!hasAny}
+            className="flex-1 rounded-xl border border-border/50 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:border-border hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Limpar
+          </button>
+          <button
+            onClick={onApply}
+            className="flex-1 rounded-xl bg-gold py-2.5 text-sm font-semibold text-white shadow-md shadow-gold/20 transition-all hover:bg-gold-dark hover:shadow-gold/30 active:scale-95"
+          >
+            Aplicar
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
