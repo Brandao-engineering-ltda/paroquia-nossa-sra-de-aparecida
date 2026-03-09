@@ -19,7 +19,7 @@ describe("ContactSection", () => {
   it("renders address details", () => {
     render(<ContactSection />);
     expect(
-      screen.getByText("Praça Nossa Senhora Aparecida, s/n")
+      screen.getByText("Pç. Nossa Senhora Aparecida, s/n")
     ).toBeInTheDocument();
     expect(screen.getByText("CEP: 87020-790")).toBeInTheDocument();
   });

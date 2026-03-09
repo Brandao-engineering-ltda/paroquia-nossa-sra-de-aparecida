@@ -1,14 +1,13 @@
 "use client";
 
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 
 const contactInfo = [
   {
     icon: MapPin,
     title: "Endereço",
     lines: [
-      "Praça Nossa Senhora Aparecida, s/n",
+      "Pç. Nossa Senhora Aparecida, s/n",
       "Vila Esperança — Maringá, PR",
       "CEP: 87020-790",
     ],
@@ -50,42 +49,56 @@ export function ContactSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {contactInfo.map((info) => (
-            <Card
-              key={info.title}
-              className="border-border/50 transition-all duration-300 hover:-translate-y-1 hover:border-royal/30 hover:shadow-lg"
-            >
-              <CardContent className="flex flex-col items-center p-6 text-center">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-royal to-navy text-white">
-                  <info.icon className="h-6 w-6" />
-                </div>
-                <h3 className="mb-2 font-semibold text-foreground">{info.title}</h3>
-                {info.lines.map((line) => (
-                  <p
-                    key={line}
-                    className="text-sm text-muted-foreground"
-                  >
-                    {line}
-                  </p>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Map + Contact info side by side */}
+        <div className="overflow-hidden rounded-2xl border border-border/50 bg-card shadow-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-5">
+            {/* Map — takes 3 columns */}
+            <div className="relative lg:col-span-3">
+              <iframe
+                title="Localização da Paróquia Nossa Senhora Aparecida"
+                src="https://www.google.com/maps?q=Praça+Nossa+Senhora+Aparecida,+s/n,+Vila+Esperança,+Maringá,+PR&output=embed"
+                className="h-72 w-full lg:absolute lg:inset-0 lg:h-full"
+                style={{ border: 0, minHeight: 320 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
 
-        {/* Map */}
-        <div className="mt-12 overflow-hidden rounded-2xl border border-border/50 shadow-lg">
-          <iframe
-            title="Localização da Paróquia Nossa Senhora Aparecida"
-            src="https://www.google.com/maps?q=Praça+Nossa+Senhora+Aparecida,+s/n,+Vila+Esperança,+Maringá,+PR&output=embed"
-            width="100%"
-            height="400"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+            {/* Contact details — takes 2 columns */}
+            <div className="flex flex-col justify-center gap-6 p-8 lg:col-span-2">
+              {contactInfo.map((info) => (
+                <div key={info.title} className="flex gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-royal to-navy text-white">
+                    <info.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {info.title}
+                    </h3>
+                    {info.lines.map((line) => (
+                      <p
+                        key={line}
+                        className="text-sm leading-relaxed text-muted-foreground"
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Praça+Nossa+Senhora+Aparecida,+s/n,+Vila+Esperança,+Maringá,+PR"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 self-start rounded-lg bg-gradient-to-r from-royal to-navy px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:shadow-lg hover:shadow-royal/25"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Abrir no Google Maps
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
