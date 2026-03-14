@@ -175,6 +175,42 @@ html {
   50% { box-shadow: 0 0 0 6px rgba(41, 104, 169, 0); }
 }
 
+/* Hero — liturgical verse fade-in */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero — sun ray slow rotation */
+@keyframes sun-rays-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hero — sun ray opacity pulse */
+@keyframes sun-rays-pulse {
+  0%, 100% { opacity: 0.07; }
+  50% { opacity: 0.13; }
+}
+
+/* Hero — sun glow breathing */
+@keyframes sun-glow-breathe {
+  0%, 100% { opacity: 0.10; transform: translate(-50%, -25%) scale(1); }
+  50% { opacity: 0.18; transform: translate(-50%, -25%) scale(1.1); }
+}
+
+/* Hero — secondary rays counter-rotation */
+@keyframes sun-rays-counter {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* Hero — shimmer drift across rays */
+@keyframes sun-shimmer {
+  0%, 100% { opacity: 0; transform: rotate(0deg) scale(0.9); }
+  50% { opacity: 0.06; transform: rotate(6deg) scale(1.05); }
+}
+
 /* Calendar — view slide-fade transition */
 @keyframes cal-view-in {
   from { opacity: 0; transform: translateY(8px); }

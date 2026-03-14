@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo, startTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { Home, CalendarDays, Shield, Moon, Sun } from "lucide-react";
 import {
@@ -19,15 +20,31 @@ interface NavItem {
   label: string;
 }
 
-const navItems: NavItem[] = [
+const BASE_NAV_ITEMS: NavItem[] = [
   { href: "/", icon: Home, label: "Início" },
   { href: "/calendario", icon: CalendarDays, label: "Calendário" },
-  { href: "/admin", icon: Shield, label: "Admin" },
 ];
+
+const ADMIN_NAV_ITEM: NavItem = { href: "/admin", icon: Shield, label: "Admin" };
 
 export function FloatingToolbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { theme, setTheme } = useTheme();
+
+  // Defer admin item to client to avoid hydration mismatch —
+  // server renders without session, client hydrates with it.
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    startTransition(() => setIsAdmin(session?.user?.role === "admin"));
+  }, [session?.user?.role]);
+
+  const navItems = useMemo(() => {
+    if (isAdmin) {
+      return [...BASE_NAV_ITEMS, ADMIN_NAV_ITEM];
+    }
+    return BASE_NAV_ITEMS;
+  }, [isAdmin]);
   const [themeBounce, setThemeBounce] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const navRef = useRef<HTMLDivElement>(null);
