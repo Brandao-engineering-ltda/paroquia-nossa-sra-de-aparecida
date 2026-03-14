@@ -26,6 +26,7 @@ interface EventData {
 type ViewMode = "day" | "week" | "month" | "year";
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const WEEKDAYS_SHORT = ["D", "S", "T", "Q", "Q", "S", "S"];
 const WEEKDAYS_FULL = [
   "Domingo",
   "Segunda-feira",
@@ -325,25 +326,25 @@ export function CalendarGrid() {
   return (
     <div>
       {/* Controls row — glassmorphic bar */}
-      <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-border/40 bg-card/60 p-3 shadow-sm backdrop-blur-md sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:rounded-full sm:px-5 sm:py-2.5">
+      <div className="mb-5 flex flex-col gap-2 rounded-2xl border border-border/40 bg-card/60 p-2.5 shadow-sm backdrop-blur-md sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:rounded-full sm:p-3 sm:px-5 sm:py-2.5">
         {/* Navigation */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("prev")}
-            className="h-8 w-8 rounded-full transition-transform hover:scale-110 active:scale-95"
+            className="h-7 w-7 shrink-0 rounded-full transition-transform hover:scale-110 active:scale-95 sm:h-8 sm:w-8"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h2 className="min-w-0 px-1 text-lg font-bold tracking-tight text-foreground sm:text-xl">
+          <h2 className="min-w-0 flex-1 truncate px-0.5 text-sm font-bold tracking-tight text-foreground sm:flex-none sm:px-1 sm:text-xl">
             {getTitle()}
           </h2>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("next")}
-            className="h-8 w-8 rounded-full transition-transform hover:scale-110 active:scale-95"
+            className="h-7 w-7 shrink-0 rounded-full transition-transform hover:scale-110 active:scale-95 sm:h-8 sm:w-8"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -351,7 +352,7 @@ export function CalendarGrid() {
             variant="outline"
             size="sm"
             onClick={goToToday}
-            className="ml-1 h-7 rounded-full border-royal/20 text-xs font-semibold text-royal transition-all hover:border-royal/40 hover:bg-royal/5"
+            className="ml-0.5 h-6 rounded-full border-royal/20 px-2 text-[10px] font-semibold text-royal transition-all hover:border-royal/40 hover:bg-royal/5 sm:ml-1 sm:h-7 sm:px-3 sm:text-xs"
           >
             Hoje
           </Button>
@@ -363,14 +364,15 @@ export function CalendarGrid() {
               setShowFilter(true);
             }}
             className={cn(
-              "relative ml-1 h-7 rounded-full border-royal/20 text-xs font-semibold transition-all hover:border-royal/40 hover:bg-royal/5",
+              "relative ml-0.5 h-6 rounded-full border-royal/20 px-2 text-[10px] font-semibold transition-all hover:border-royal/40 hover:bg-royal/5 sm:ml-1 sm:h-7 sm:px-3 sm:text-xs",
               isFilterActive
                 ? "border-gold/50 bg-gold/10 text-gold-dark hover:border-gold/70 hover:bg-gold/15"
                 : "text-royal"
             )}
           >
-            <SlidersHorizontal className="mr-1 h-3 w-3" />
-            Filtro
+            <SlidersHorizontal className="mr-0.5 h-3 w-3 sm:mr-1" />
+            <span className="hidden sm:inline">Filtro</span>
+            <span className="sm:hidden">F</span>
             {isFilterActive && (
               <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-gold shadow-sm" />
             )}
@@ -378,13 +380,13 @@ export function CalendarGrid() {
         </div>
 
         {/* Right controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-1.5 sm:justify-end sm:gap-2">
           {/* Search toggle */}
           <Button
             variant="ghost"
             size="icon"
             className={cn(
-              "h-8 w-8 rounded-full transition-all",
+              "h-7 w-7 shrink-0 rounded-full transition-all sm:h-8 sm:w-8",
               showSearch && "bg-royal/10 text-royal"
             )}
             onClick={() => {
@@ -418,7 +420,7 @@ export function CalendarGrid() {
                   setViewKey((k) => k + 1);
                 }}
                 className={cn(
-                  "relative z-10 px-3 py-1.5 text-xs font-medium transition-colors duration-300 sm:text-sm",
+                  "relative z-10 px-2 py-1 text-[10px] font-medium transition-colors duration-300 sm:px-3 sm:py-1.5 sm:text-sm",
                   viewMode === opt.value
                     ? "text-white"
                     : "text-muted-foreground hover:text-foreground"
@@ -431,7 +433,7 @@ export function CalendarGrid() {
 
           {/* New event button */}
           <Button
-            className="rounded-full bg-gold text-white shadow-md shadow-gold/20 transition-all hover:bg-gold-dark hover:shadow-lg hover:shadow-gold/30 active:scale-95"
+            className="h-7 rounded-full bg-gold px-2.5 text-white shadow-md shadow-gold/20 transition-all hover:bg-gold-dark hover:shadow-lg hover:shadow-gold/30 active:scale-95 sm:h-9 sm:px-4"
             size="sm"
             onClick={() => {
               setEditingEvent(null);
@@ -439,7 +441,7 @@ export function CalendarGrid() {
               setShowEventForm(true);
             }}
           >
-            <Plus className="mr-1 h-4 w-4" />
+            <Plus className="h-4 w-4 sm:mr-1" />
             <span className="hidden sm:inline">Novo</span>
           </Button>
         </div>
@@ -638,71 +640,98 @@ function MonthView({
   const firstDayOfWeek = getFirstDayOfWeek(year, month);
 
   return (
-    <div className="-mx-4 overflow-x-auto sm:mx-0">
-      <div className="min-w-[500px] overflow-hidden rounded-2xl border border-border/40 bg-card/80 shadow-sm backdrop-blur-sm sm:min-w-0">
-        {/* Weekday headers */}
-        <div className="grid grid-cols-7 border-b border-border/30">
-          {WEEKDAYS.map((day, i) => (
+    <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/80 shadow-sm backdrop-blur-sm">
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 border-b border-border/30">
+        {WEEKDAYS.map((day, i) => (
+          <div
+            key={day}
+            className={cn(
+              "px-0.5 py-2 text-center text-[10px] font-semibold uppercase tracking-wider sm:px-2 sm:py-3 sm:text-sm",
+              i === 0 || i === 6
+                ? "text-royal/60"
+                : "text-muted-foreground"
+            )}
+          >
+            <span className="hidden sm:inline">{day}</span>
+            <span className="sm:hidden">{WEEKDAYS_SHORT[i]}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Day cells */}
+      <div className="grid grid-cols-7">
+        {/* Empty cells for padding */}
+        {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+          <div
+            key={`empty-${i}`}
+            className="min-h-[48px] border-b border-r border-border/20 bg-muted/30 sm:min-h-[100px]"
+          />
+        ))}
+
+        {/* Actual day cells */}
+        {Array.from({ length: daysInMonth }).map((_, i) => {
+          const day = i + 1;
+          const dateStr = formatDateStr(year, month, day);
+          const dayEvents = events.filter((e) => e.date === dateStr);
+          const isToday = dateStr === todayStr;
+          const hasMatch = dayEvents.some((e) => searchMatchIds.has(e.id));
+          const isWeekend = (firstDayOfWeek + i) % 7 === 0 || (firstDayOfWeek + i) % 7 === 6;
+
+          return (
             <div
               key={day}
+              onClick={() => onDayClick(day)}
               className={cn(
-                "px-1 py-2.5 text-center text-xs font-semibold uppercase tracking-wider sm:px-2 sm:py-3 sm:text-sm",
-                i === 0 || i === 6
-                  ? "text-royal/60"
-                  : "text-muted-foreground"
+                "cal-cell-animate group relative min-h-[48px] cursor-pointer border-b border-r border-border/20 p-0.5 transition-all duration-200 sm:min-h-[100px] sm:p-1.5",
+                "hover:z-10 hover:bg-royal/5 hover:shadow-inner",
+                isToday && "bg-gradient-to-br from-royal/8 to-royal/3",
+                isWeekend && !isToday && "bg-muted/20",
+                hasMatch && "ring-2 ring-inset ring-gold/40"
               )}
+              style={{ animationDelay: `${i * 12}ms` }}
             >
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Day cells */}
-        <div className="grid grid-cols-7">
-          {/* Empty cells for padding */}
-          {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-            <div
-              key={`empty-${i}`}
-              className="min-h-[60px] border-b border-r border-border/20 bg-muted/30 sm:min-h-[100px]"
-            />
-          ))}
-
-          {/* Actual day cells */}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const dateStr = formatDateStr(year, month, day);
-            const dayEvents = events.filter((e) => e.date === dateStr);
-            const isToday = dateStr === todayStr;
-            const hasMatch = dayEvents.some((e) => searchMatchIds.has(e.id));
-            const isWeekend = (firstDayOfWeek + i) % 7 === 0 || (firstDayOfWeek + i) % 7 === 6;
-
-            return (
-              <div
-                key={day}
-                onClick={() => onDayClick(day)}
+              {/* Day number */}
+              <span
                 className={cn(
-                  "cal-cell-animate group relative min-h-[60px] cursor-pointer border-b border-r border-border/20 p-1 transition-all duration-200 sm:min-h-[100px] sm:p-1.5",
-                  "hover:z-10 hover:bg-royal/5 hover:shadow-inner",
-                  isToday && "bg-gradient-to-br from-royal/8 to-royal/3",
-                  isWeekend && !isToday && "bg-muted/20",
-                  hasMatch && "ring-2 ring-inset ring-gold/40"
+                  "relative inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium transition-all duration-200 sm:h-7 sm:w-7 sm:text-sm",
+                  isToday
+                    ? "cal-today-ring bg-royal font-bold text-white shadow-md shadow-royal/30"
+                    : "text-foreground group-hover:bg-royal/10 group-hover:font-semibold"
                 )}
-                style={{ animationDelay: `${i * 12}ms` }}
               >
-                {/* Day number */}
-                <span
-                  className={cn(
-                    "relative inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium transition-all duration-200 sm:h-7 sm:w-7 sm:text-sm",
-                    isToday
-                      ? "cal-today-ring bg-royal font-bold text-white shadow-md shadow-royal/30"
-                      : "text-foreground group-hover:bg-royal/10 group-hover:font-semibold"
-                  )}
-                >
-                  {day}
-                </span>
+                {day}
+              </span>
 
-                {/* Events */}
-                <div className="mt-0.5 space-y-0.5 sm:mt-1 sm:space-y-1">
+              {/* Events — dots on mobile, chips on desktop */}
+              <div className="mt-0.5 sm:mt-1">
+                {/* Mobile: colored dots */}
+                <div className="flex flex-wrap gap-0.5 sm:hidden">
+                  {dayEvents.slice(0, 3).map((event) => {
+                    const color = getTipoColor(event.tipo);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEventClick(event);
+                        }}
+                        className={cn(
+                          "h-1.5 w-1.5 rounded-full transition-all",
+                          color.dot,
+                          filterMatchIds !== null && !filterMatchIds.has(event.id) && "opacity-25",
+                          searchMatchIds.has(event.id) && "ring-1 ring-gold/60"
+                        )}
+                      />
+                    );
+                  })}
+                  {dayEvents.length > 3 && (
+                    <span className="text-[8px] leading-none text-royal/50">+{dayEvents.length - 3}</span>
+                  )}
+                </div>
+
+                {/* Desktop: event chips */}
+                <div className="hidden space-y-1 sm:block">
                   {dayEvents.slice(0, 2).map((event) => {
                     const color = getTipoColor(event.tipo);
                     return (
@@ -713,7 +742,7 @@ function MonthView({
                           onEventClick(event);
                         }}
                         className={cn(
-                          "cal-event-chip flex w-full items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-left text-[10px] font-medium transition-all duration-200 sm:px-2 sm:text-xs",
+                          "cal-event-chip flex w-full items-center gap-1 truncate rounded-md px-2 py-0.5 text-left text-xs font-medium transition-all duration-200",
                           filterMatchIds !== null && !filterMatchIds.has(event.id)
                             ? "opacity-25"
                             : searchMatchIds.has(event.id)
@@ -723,7 +752,7 @@ function MonthView({
                         )}
                       >
                         <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", color.dot)} />
-                        <span className="hidden truncate sm:inline">
+                        <span className="truncate">
                           {event.startTime && (
                             <span className="mr-1 font-semibold opacity-60">
                               {event.startTime}
@@ -731,22 +760,19 @@ function MonthView({
                           )}
                           <HighlightText text={event.title} query={searchQuery} />
                         </span>
-                        <span className="truncate sm:hidden">
-                          <HighlightText text={event.title} query={searchQuery} />
-                        </span>
                       </button>
                     );
                   })}
                   {dayEvents.length > 2 && (
-                    <p className="px-1.5 text-[10px] font-medium text-royal/60 sm:px-2 sm:text-xs">
+                    <p className="px-2 text-xs font-medium text-royal/60">
                       +{dayEvents.length - 2} mais
                     </p>
                   )}
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -774,8 +800,9 @@ function WeekView({
   const weekDates = getWeekDates(currentDate);
 
   return (
-    <div className="-mx-4 overflow-x-auto sm:mx-0">
-      <div className="min-w-[500px] overflow-hidden rounded-2xl border border-border/40 bg-card/80 shadow-sm backdrop-blur-sm sm:min-w-0">
+    <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/80 shadow-sm backdrop-blur-sm">
+      {/* Desktop: 7-column grid */}
+      <div className="hidden sm:block">
         <div className="grid grid-cols-7">
           {weekDates.map((d, i) => {
             const dateStr = dateToStr(d);
@@ -787,7 +814,7 @@ function WeekView({
               <div
                 key={i}
                 className={cn(
-                  "cal-cell-animate min-h-[200px] border-r border-border/20 p-2 transition-all sm:min-h-[300px] sm:p-3",
+                  "cal-cell-animate min-h-[300px] border-r border-border/20 p-3 transition-all",
                   isToday && "bg-gradient-to-b from-royal/8 to-transparent",
                   isWeekend && !isToday && "bg-muted/20",
                   i < 6 && "border-r"
@@ -797,14 +824,14 @@ function WeekView({
                 {/* Day header */}
                 <div className="mb-3 text-center">
                   <p className={cn(
-                    "text-[10px] font-semibold uppercase tracking-wider sm:text-xs",
+                    "text-xs font-semibold uppercase tracking-wider",
                     isToday ? "text-royal" : "text-muted-foreground"
                   )}>
                     {WEEKDAYS[i]}
                   </p>
                   <span
                     className={cn(
-                      "mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-all sm:h-10 sm:w-10",
+                      "mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all",
                       isToday
                         ? "cal-today-ring bg-royal text-white shadow-md shadow-royal/30"
                         : "text-foreground hover:bg-muted"
@@ -853,6 +880,98 @@ function WeekView({
             );
           })}
         </div>
+      </div>
+
+      {/* Mobile: vertical list */}
+      <div className="divide-y divide-border/20 sm:hidden">
+        {weekDates.map((d, i) => {
+          const dateStr = dateToStr(d);
+          const dayEvents = events.filter((e) => e.date === dateStr);
+          const isToday = dateStr === todayStr;
+
+          return (
+            <div
+              key={i}
+              className={cn(
+                "cal-cell-animate p-3",
+                isToday && "bg-gradient-to-r from-royal/8 to-transparent"
+              )}
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              {/* Day header row */}
+              <div className="mb-2 flex items-center gap-2.5">
+                <span
+                  className={cn(
+                    "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+                    isToday
+                      ? "cal-today-ring bg-royal text-white shadow-md shadow-royal/30"
+                      : "bg-muted/50 text-foreground"
+                  )}
+                >
+                  {d.getDate()}
+                </span>
+                <div>
+                  <p className={cn(
+                    "text-xs font-semibold",
+                    isToday ? "text-royal" : "text-foreground"
+                  )}>
+                    {WEEKDAYS_FULL[i]}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {d.getDate()} de {MONTH_NAMES_SHORT[d.getMonth()]}
+                  </p>
+                </div>
+                {isToday && (
+                  <span className="ml-auto rounded-full bg-royal/10 px-2 py-0.5 text-[10px] font-semibold text-royal">
+                    Hoje
+                  </span>
+                )}
+              </div>
+
+              {/* Events list */}
+              {dayEvents.length > 0 ? (
+                <div className="ml-11 space-y-1.5">
+                  {dayEvents.map((event, ei) => {
+                    const color = getTipoColor(event.tipo);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => onEventClick(event)}
+                        className={cn(
+                          "cal-cell-animate flex w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-xs transition-all hover:shadow-md",
+                          color.bg, color.text, color.border,
+                          filterMatchIds !== null && !filterMatchIds.has(event.id)
+                            ? "opacity-25"
+                            : searchMatchIds.has(event.id) && "ring-1 ring-offset-1 shadow-sm",
+                          filterMatchIds !== null && filterMatchIds.has(event.id) && "ring-1 ring-gold/60 shadow-sm"
+                        )}
+                        style={{ animationDelay: `${(i * 50) + (ei * 30)}ms` }}
+                      >
+                        <span className={cn("h-2 w-2 shrink-0 rounded-full", color.dot)} />
+                        <div className="min-w-0 flex-1">
+                          <span className="block truncate font-medium">
+                            <HighlightText text={event.title} query={searchQuery} />
+                          </span>
+                          {event.startTime && (
+                            <span className="block text-[10px] font-semibold opacity-60">
+                              {event.startTime}
+                              {event.endTime && ` – ${event.endTime}`}
+                            </span>
+                          )}
+                        </div>
+                        <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-semibold", color.bg, color.text)}>
+                          {event.tipo}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="ml-11 text-[11px] text-muted-foreground/50">Sem eventos</p>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
