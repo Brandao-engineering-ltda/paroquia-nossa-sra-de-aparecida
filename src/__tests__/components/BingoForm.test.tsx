@@ -199,4 +199,77 @@ describe("BingoForm", () => {
       screen.getByText("Clique para selecionar uma imagem")
     ).toBeInTheDocument();
   });
+
+  it("shows image preview and remove button when bingo has imageUrl", () => {
+    const bingoWithImage = { ...existingBingo, imageUrl: "https://example.com/img.jpg" };
+    render(
+      <BingoForm
+        bingo={bingoWithImage}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+      />
+    );
+    expect(screen.getByAltText("Preview")).toBeInTheDocument();
+    expect(screen.queryByText("Clique para selecionar uma imagem")).not.toBeInTheDocument();
+  });
+
+  it("removes image when X button is clicked", async () => {
+    const user = userEvent.setup();
+    const bingoWithImage = { ...existingBingo, imageUrl: "https://example.com/img.jpg" };
+    render(
+      <BingoForm
+        bingo={bingoWithImage}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+      />
+    );
+
+    // Click the remove image button (the X icon button)
+    const removeButtons = screen.getAllByRole("button");
+    const removeBtn = removeButtons.find(
+      (btn) => btn.querySelector("svg") && btn.closest(".flex.items-center.gap-3")
+    );
+    if (removeBtn) await user.click(removeBtn);
+
+    expect(
+      screen.getByText("Clique para selecionar uma imagem")
+    ).toBeInTheDocument();
+  });
+
+  it("uploads file and sets image URL on success", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ url: "https://example.com/uploaded.jpg" }),
+    });
+
+    render(
+      <BingoForm bingo={null} onClose={mockOnClose} onSuccess={mockOnSuccess} />
+    );
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(["test"], "test.png", { type: "image/png" });
+
+    await userEvent.upload(fileInput, file);
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/upload", expect.objectContaining({ method: "POST" }));
+    expect(await screen.findByAltText("Preview")).toBeInTheDocument();
+  });
+
+  it("shows error when file upload fails", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: () => Promise.resolve({ error: "Arquivo muito grande" }),
+    });
+
+    render(
+      <BingoForm bingo={null} onClose={mockOnClose} onSuccess={mockOnSuccess} />
+    );
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(["test"], "test.png", { type: "image/png" });
+
+    await userEvent.upload(fileInput, file);
+
+    expect(await screen.findByText("Arquivo muito grande")).toBeInTheDocument();
+  });
 });

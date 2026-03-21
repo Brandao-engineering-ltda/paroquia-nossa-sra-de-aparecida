@@ -139,6 +139,75 @@ describe("PUT /api/bingo/[id]", () => {
       })
     );
   });
+
+  it("clears optional fields when empty strings are sent", async () => {
+    mockAuth.mockResolvedValue(adminSession);
+    mockFindUnique.mockResolvedValue(existingBingo as Awaited<ReturnType<typeof prisma.bingoEvent.findUnique>>);
+    mockUpdate.mockResolvedValue({
+      ...existingBingo,
+      date: null,
+      startTime: null,
+      endTime: null,
+      location: null,
+      imageUrl: null,
+      price: null,
+    } as Awaited<ReturnType<typeof prisma.bingoEvent.update>>);
+
+    const req = new Request("http://localhost/api/bingo/bg1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        date: "",
+        startTime: "",
+        endTime: "",
+        location: "",
+        imageUrl: "",
+        price: "",
+      }),
+    });
+
+    const res = await PUT(req, makeParams("bg1"));
+    expect(res.status).toBe(200);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          date: null,
+          startTime: null,
+          endTime: null,
+          location: null,
+          imageUrl: null,
+          price: null,
+        }),
+      })
+    );
+  });
+
+  it("keeps existing values when fields are not sent", async () => {
+    mockAuth.mockResolvedValue(adminSession);
+    mockFindUnique.mockResolvedValue(existingBingo as Awaited<ReturnType<typeof prisma.bingoEvent.findUnique>>);
+    mockUpdate.mockResolvedValue(existingBingo as Awaited<ReturnType<typeof prisma.bingoEvent.update>>);
+
+    const req = new Request("http://localhost/api/bingo/bg1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Only Title" }),
+    });
+
+    const res = await PUT(req, makeParams("bg1"));
+    expect(res.status).toBe(200);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          date: existingBingo.date,
+          startTime: existingBingo.startTime,
+          endTime: existingBingo.endTime,
+          location: existingBingo.location,
+          imageUrl: existingBingo.imageUrl,
+          price: existingBingo.price,
+        }),
+      })
+    );
+  });
 });
 
 describe("DELETE /api/bingo/[id]", () => {
