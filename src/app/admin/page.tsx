@@ -1,15 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, CalendarDays, UserCheck, Megaphone } from "lucide-react";
+import { Users, CalendarDays, UserCheck, Megaphone, Ticket } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const [totalUsers, activeUsers, totalEvents, activeBanners] = await Promise.all([
+  const [totalUsers, activeUsers, totalEvents, activeBanners, activeBingos] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
     prisma.event.count(),
     prisma.banner.count({ where: { isActive: true } }),
+    prisma.bingoEvent.count({ where: { isActive: true } }),
   ]);
 
   const stats = [
@@ -40,6 +41,13 @@ export default async function AdminDashboard() {
       icon: Megaphone,
       color: "text-royal",
       bg: "bg-sky/10",
+    },
+    {
+      label: "Bingo Ativo",
+      value: activeBingos,
+      icon: Ticket,
+      color: "text-gold-dark",
+      bg: "bg-gold/10",
     },
   ];
 

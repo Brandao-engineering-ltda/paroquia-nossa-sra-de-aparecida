@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, LogIn, LogOut, CalendarDays, Shield } from "lucide-react";
+import { Menu, LogIn, LogOut, CalendarDays, Shield, Ticket } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -26,8 +26,17 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const [hasBingo, setHasBingo] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  // Check if there's an active bingo event
+  useEffect(() => {
+    fetch("/api/bingo?active=true")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setHasBingo(Array.isArray(data) && data.length > 0))
+      .catch(() => {});
+  }, []);
 
   // Track scroll for glassmorphism transition
   useEffect(() => {
@@ -199,6 +208,22 @@ export function Header() {
             })}
           </div>
 
+          {/* Bingo link — only when active */}
+          {hasBingo && (
+            <Link
+              href="/bingo"
+              className={cn(
+                "ml-1 flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm font-medium transition-all duration-300",
+                scrolled
+                  ? "border-gold/30 bg-gold/10 text-gold-dark hover:bg-gold/20"
+                  : "border-gold/30 bg-gold/10 text-gold-light hover:bg-gold/20"
+              )}
+            >
+              <Ticket className="h-3.5 w-3.5" />
+              Bingo
+            </Link>
+          )}
+
           {/* Separator */}
           <div
             className={cn(
@@ -304,6 +329,17 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
+
+                {hasBingo && (
+                  <Link
+                    href="/bingo"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/10 px-4 py-3 text-base font-medium text-gold-dark transition-colors hover:bg-gold/20 dark:text-gold-light"
+                  >
+                    <Ticket className="h-4 w-4" />
+                    Bingo
+                  </Link>
+                )}
 
                 {session ? (
                   <>

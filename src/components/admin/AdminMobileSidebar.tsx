@@ -7,6 +7,7 @@ import {
   Users,
   CalendarDays,
   Megaphone,
+  Ticket,
   ArrowLeft,
   Menu,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const links = [
   { href: "/admin/usuarios", label: "Usuários", icon: Users },
   { href: "/admin/eventos", label: "Eventos", icon: CalendarDays },
   { href: "/admin/destaques", label: "Destaques", icon: Megaphone },
+  { href: "/admin/bingo", label: "Bingo", icon: Ticket },
 ];
 
 export function AdminMobileSidebar() {
