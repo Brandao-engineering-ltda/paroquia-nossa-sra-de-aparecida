@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, startTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, LogIn, LogOut, CalendarDays, Shield, Ticket } from "lucide-react";
@@ -23,6 +23,14 @@ export function Header() {
   const { isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } =
     useParishStore();
   const { data: session } = useSession();
+
+  // Defer session-dependent rendering to avoid hydration mismatch —
+  // server has no session, client hydrates with it.
+  const [clientSession, setClientSession] = useState<typeof session>(null);
+  useEffect(() => {
+    startTransition(() => setClientSession(session));
+  }, [session]);
+
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
@@ -233,7 +241,7 @@ export function Header() {
           />
 
           {/* Auth actions */}
-          {session ? (
+          {clientSession ? (
             <>
               <Link
                 href="/calendario"
@@ -247,7 +255,7 @@ export function Header() {
                 <CalendarDays className="h-3.5 w-3.5" />
                 Calendário
               </Link>
-              {session.user.role === "admin" && (
+              {clientSession.user.role === "admin" && (
                 <Link
                   href="/admin"
                   className={cn(
@@ -330,18 +338,7 @@ export function Header() {
                   </Link>
                 ))}
 
-                {hasBingo && (
-                  <Link
-                    href="/bingo"
-                    onClick={closeMobileMenu}
-                    className="flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/10 px-4 py-3 text-base font-medium text-gold-dark transition-colors hover:bg-gold/20 dark:text-gold-light"
-                  >
-                    <Ticket className="h-4 w-4" />
-                    Bingo
-                  </Link>
-                )}
-
-                {session ? (
+                {clientSession ? (
                   <>
                     <Link
                       href="/calendario"
@@ -351,7 +348,7 @@ export function Header() {
                       <CalendarDays className="h-4 w-4" />
                       Calendário
                     </Link>
-                    {session.user.role === "admin" && (
+                    {clientSession.user.role === "admin" && (
                       <Link
                         href="/admin"
                         onClick={closeMobileMenu}

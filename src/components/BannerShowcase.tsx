@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { CalendarDays, MapPin, Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, MapPin, Clock, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface BannerData {
   id: string;
@@ -73,7 +74,8 @@ function BannerCard({
       )}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
+      <Link href={`/destaques/${banner.id}`} className="block group/card">
+      <div className="relative overflow-hidden rounded-2xl bg-black shadow-2xl cursor-pointer transition-all duration-300 group-hover/card:ring-2 group-hover/card:ring-white/30 group-hover/card:shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
         {/* Background image (base layer) */}
         {banner.imageUrl && (
           <div
@@ -131,7 +133,7 @@ function BannerCard({
             </p>
           </div>
 
-          {/* Bottom: Meta + CTA */}
+          {/* Bottom: Meta + Ver detalhes */}
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="space-y-1.5">
               {(banner.startTime || banner.endTime) && (
@@ -151,26 +153,15 @@ function BannerCard({
               )}
             </div>
 
-            {banner.ctaText && banner.ctaUrl && (
-              <a
-                href={banner.ctaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex"
-              >
-                <Button
-                  className="bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/25"
-                  size="lg"
-                >
-                  {banner.ctaText}
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </a>
-            )}
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-white/70 transition-all duration-300 group-hover/card:text-white">
+              Ver detalhes
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/card:translate-x-1" />
+            </span>
           </div>
         </div>
 
       </div>
+      </Link>
     </div>
   );
 }
