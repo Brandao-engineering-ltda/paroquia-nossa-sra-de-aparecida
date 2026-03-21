@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { Header } from "@/components/Header";
+
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
 
 // Mock next-auth/react
 const mockSession: { data: unknown; status: string } = { data: null, status: "unauthenticated" };
@@ -29,6 +32,12 @@ describe("Header", () => {
   beforeEach(() => {
     mockSession.data = null;
     mockSession.status = "unauthenticated";
+    mockFetch.mockReset();
+    // Default: no active bingo
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
   });
 
   it("renders parish name", () => {
@@ -96,5 +105,55 @@ describe("Header", () => {
   it("renders location text", () => {
     render(<Header />);
     expect(screen.getByText("Maringá — PR")).toBeInTheDocument();
+  });
+
+  it("does not show bingo link when no active bingo events", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
+
+    render(<Header />);
+
+    // Wait for fetch to complete
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith("/api/bingo?active=true");
+    });
+
+    // Bingo link should not appear
+    expect(screen.queryByText("Bingo")).not.toBeInTheDocument();
+  });
+
+  it("shows bingo link when active bingo exists", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve([{ id: "bg1", title: "Bingo Beneficente", isActive: true }]),
+    });
+
+    render(<Header />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Bingo").length).toBeGreaterThan(0);
+    });
+
+    const bingoLinks = screen.getAllByText("Bingo");
+    const link = bingoLinks[0].closest("a");
+    expect(link).toHaveAttribute("href", "/bingo");
+  });
+
+  it("does not show bingo link when fetch fails", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve([]),
+    });
+
+    render(<Header />);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalled();
+    });
+
+    expect(screen.queryByText("Bingo")).not.toBeInTheDocument();
   });
 });
