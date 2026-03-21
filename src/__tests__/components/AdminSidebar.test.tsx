@@ -13,6 +13,7 @@ describe("AdminSidebar", () => {
     expect(screen.getByText("Painel")).toBeInTheDocument();
     expect(screen.getByText("Usuários")).toBeInTheDocument();
     expect(screen.getByText("Eventos")).toBeInTheDocument();
+    expect(screen.getByText("Bingo")).toBeInTheDocument();
   });
 
   it("renders back to site link", () => {
@@ -35,5 +36,7 @@ describe("AdminSidebar", () => {
     expect(usersLink).toHaveAttribute("href", "/admin/usuarios");
     const eventsLink = screen.getByText("Eventos").closest("a");
     expect(eventsLink).toHaveAttribute("href", "/admin/eventos");
+    const bingoLink = screen.getByText("Bingo").closest("a");
+    expect(bingoLink).toHaveAttribute("href", "/admin/bingo");
   });
 });

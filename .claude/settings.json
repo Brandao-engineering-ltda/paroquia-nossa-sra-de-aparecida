@@ -1,0 +1,51 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version)",
+      "Bash(npx prisma db seed)",
+      "Bash(bun --version)",
+      "Read(//opt/homebrew/opt/**)",
+      "Read(//opt/homebrew/Cellar/**)",
+      "Bash(ls /opt/homebrew/opt/icu4c/lib/libicui18n*)",
+      "Bash(ln -sf /opt/homebrew/opt/icu4c/lib/libicui18n.78.dylib /opt/homebrew/opt/icu4c/lib/libicui18n.73.dylib)",
+      "Bash(ln -sf /opt/homebrew/opt/icu4c/lib/libicuuc.78.dylib /opt/homebrew/opt/icu4c/lib/libicuuc.73.dylib)",
+      "Bash(ln -sf /opt/homebrew/opt/icu4c/lib/libicudata.78.dylib /opt/homebrew/opt/icu4c/lib/libicudata.73.dylib)",
+      "Bash(rm /opt/homebrew/opt/icu4c/lib/libicui18n.73.dylib /opt/homebrew/opt/icu4c/lib/libicuuc.73.dylib /opt/homebrew/opt/icu4c/lib/libicudata.73.dylib)",
+      "Read(//Users/mymac/.nvm/versions/node/**)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/node --version)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/npx prisma db seed)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/npx tsx prisma/seed.ts)",
+      "Bash(PATH=~/.nvm/versions/node/v22.21.1/bin:$PATH node --version)",
+      "Bash(PATH=~/.nvm/versions/node/v22.21.1/bin:$PATH node -e \"console.log\\(''ok''\\)\")",
+      "Bash(PATH=~/.nvm/versions/node/v22.21.1/bin:$PATH npx prisma db seed)",
+      "Bash(PATH=~/.nvm/versions/node/v22.21.1/bin:$PATH npm test)",
+      "Bash(PATH=~/.nvm/versions/node/v22.21.1/bin:$PATH npx vitest run)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/npx vitest run)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/node ~/.nvm/versions/node/v22.21.1/bin/npx vitest run)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/node /Users/mymac/paroquia-nossa-sra-de-aparecida/node_modules/.bin/vitest run)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/node /Users/mymac/paroquia-nossa-sra-de-aparecida/node_modules/.bin/vitest run --reporter=verbose)",
+      "Bash(~/.nvm/versions/node/v22.21.1/bin/node /Users/mymac/paroquia-nossa-sra-de-aparecida/node_modules/.bin/eslint src/ --max-warnings=0)",
+      "Bash(git add prisma.config.ts prisma/seed.ts src/__tests__/components/CalendarGrid.test.tsx src/__tests__/components/EventsSection.test.tsx src/components/EventsSection.tsx src/components/Footer.tsx src/components/calendario/CalendarGrid.tsx)",
+      "Bash(git add .husky/pre-commit)",
+      "Bash(npx next:*)",
+      "Bash(npx vitest:*)",
+      "WebFetch(domain:liturgia.cancaonova.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api-liturgia-diaria.vercel.app)",
+      "WebFetch(domain:liturgia.up.railway.app)",
+      "Bash(git -C /Users/mymac/paroquia-nossa-sra-de-aparecida status)",
+      "Bash(git -C /Users/mymac/paroquia-nossa-sra-de-aparecida diff)",
+      "Bash(git -C /Users/mymac/paroquia-nossa-sra-de-aparecida log --oneline -5)",
+      "Bash(git -C /Users/mymac/paroquia-nossa-sra-de-aparecida add src/__tests__/components/FloatingToolbar.test.tsx src/app/globals.css src/components/FloatingToolbar.tsx src/components/HeroSection.tsx src/components/calendario/CalendarGrid.tsx src/app/api/liturgia/route.ts)",
+      "Bash(git -C /Users/mymac/paroquia-nossa-sra-de-aparecida add src/components/FloatingToolbar.tsx)",
+      "Bash(git -C:*)",
+      "Bash(git log:*)",
+      "Bash(git stash:*)",
+      "Bash(git add:*)",
+      "Bash(rm -f .git/lint-staged_unstaged.patch)"
+    ],
+    "additionalDirectories": [
+      "/Users/mymac/paroquia-nossa-sra-de-aparecida/.git/refs"
+    ]
+  }
+}

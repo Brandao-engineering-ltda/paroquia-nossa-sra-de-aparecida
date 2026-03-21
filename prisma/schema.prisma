@@ -15,8 +15,9 @@ model User {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  events       Event[]   @relation("UserEvents")
-  banners      Banner[]  @relation("UserBanners")
+  events       Event[]      @relation("UserEvents")
+  banners      Banner[]     @relation("UserBanners")
+  bingoEvents  BingoEvent[] @relation("UserBingos")
 }
 
 model Event {
@@ -51,6 +52,23 @@ model Banner {
   isActive    Boolean  @default(true)
   order       Int      @default(0)
   createdBy   User     @relation("UserBanners", fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BingoEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  date        String?
+  startTime   String?
+  endTime     String?
+  location    String?
+  imageUrl    String?
+  price       Float?
+  isActive    Boolean  @default(false)
+  createdBy   User     @relation("UserBingos", fields: [createdById], references: [id])
   createdById String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

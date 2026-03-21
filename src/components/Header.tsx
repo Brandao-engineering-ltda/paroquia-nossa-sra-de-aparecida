@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, startTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, LogIn, LogOut, CalendarDays, Shield } from "lucide-react";
+import { Menu, LogIn, LogOut, CalendarDays, Shield, Ticket } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -23,11 +23,28 @@ export function Header() {
   const { isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } =
     useParishStore();
   const { data: session } = useSession();
+
+  // Defer session-dependent rendering to avoid hydration mismatch —
+  // server has no session, client hydrates with it.
+  const [clientSession, setClientSession] = useState<typeof session>(null);
+  useEffect(() => {
+    startTransition(() => setClientSession(session));
+  }, [session]);
+
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const [hasBingo, setHasBingo] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  // Check if there's an active bingo event
+  useEffect(() => {
+    fetch("/api/bingo?active=true")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setHasBingo(Array.isArray(data) && data.length > 0))
+      .catch(() => {});
+  }, []);
 
   // Track scroll for glassmorphism transition
   useEffect(() => {
@@ -199,6 +216,22 @@ export function Header() {
             })}
           </div>
 
+          {/* Bingo link — only when active */}
+          {hasBingo && (
+            <Link
+              href="/bingo"
+              className={cn(
+                "ml-1 flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm font-medium transition-all duration-300",
+                scrolled
+                  ? "border-gold/30 bg-gold/10 text-gold-dark hover:bg-gold/20"
+                  : "border-gold/30 bg-gold/10 text-gold-light hover:bg-gold/20"
+              )}
+            >
+              <Ticket className="h-3.5 w-3.5" />
+              Bingo
+            </Link>
+          )}
+
           {/* Separator */}
           <div
             className={cn(
@@ -208,7 +241,7 @@ export function Header() {
           />
 
           {/* Auth actions */}
-          {session ? (
+          {clientSession ? (
             <>
               <Link
                 href="/calendario"
@@ -222,7 +255,7 @@ export function Header() {
                 <CalendarDays className="h-3.5 w-3.5" />
                 Calendário
               </Link>
-              {session.user.role === "admin" && (
+              {clientSession.user.role === "admin" && (
                 <Link
                   href="/admin"
                   className={cn(
@@ -305,7 +338,7 @@ export function Header() {
                   </Link>
                 ))}
 
-                {session ? (
+                {clientSession ? (
                   <>
                     <Link
                       href="/calendario"
@@ -315,7 +348,7 @@ export function Header() {
                       <CalendarDays className="h-4 w-4" />
                       Calendário
                     </Link>
-                    {session.user.role === "admin" && (
+                    {clientSession.user.role === "admin" && (
                       <Link
                         href="/admin"
                         onClick={closeMobileMenu}
